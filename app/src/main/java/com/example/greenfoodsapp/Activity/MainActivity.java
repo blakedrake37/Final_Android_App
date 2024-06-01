@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +52,7 @@ import com.example.greenfoodsapp.Model.User;
 import com.example.greenfoodsapp.R;
 import com.example.greenfoodsapp.Service.ConnectionReceiver;
 import com.example.greenfoodsapp.databinding.ActivityMainBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -112,7 +114,6 @@ public class MainActivity extends AppCompatActivity{
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(mNavigationView, navController);
-
 
     }
     public void loadUserInfoById(String phoneNumber){
@@ -522,4 +523,5 @@ public class MainActivity extends AppCompatActivity{
     public void onBackPressed() {
         super.onBackPressed();
     }
+
 }

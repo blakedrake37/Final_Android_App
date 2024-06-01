@@ -1,5 +1,6 @@
 package com.example.greenfoodsapp.Fragment.BottomNav;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -12,11 +13,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.greenfoodsapp.Activity.ChatbotAIActivity;
 import com.example.greenfoodsapp.Adapter.ProductAdapter;
 import com.example.greenfoodsapp.Fragment.ProductFragments.FruitFragment;
 import com.example.greenfoodsapp.Fragment.ProductFragments.MeatFragment;
@@ -25,6 +28,7 @@ import com.example.greenfoodsapp.Fragment.ProductFragments.VegetableFragment;
 import com.example.greenfoodsapp.Model.Product;
 import com.example.greenfoodsapp.Model.ProductTop;
 import com.example.greenfoodsapp.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -122,7 +126,18 @@ public class HomePageFragment extends Fragment {
 
         });
 
-
+        FloatingActionButton fab = view.findViewById(R.id.btn_chatbot);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(getActivity(), ChatbotAIActivity.class);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Log.e("HomePageFragment", "Error starting ChatbotAIActivity", e);
+                }
+            }
+        });
         return view;
     }
 
