@@ -3,6 +3,7 @@ package com.example.greenfoodsapp.Model;
 import java.util.HashMap;
 import java.util.Map;
 
+// Nguyễn Đức Huy - 20145449
 public class Cart {
     private int idProduct,idCart,idCategory;
     private String imgProduct,idPartner;

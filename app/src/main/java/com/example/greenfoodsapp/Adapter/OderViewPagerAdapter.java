@@ -7,6 +7,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.example.greenfoodsapp.Fragment.Bill.CurrentOrderFragment;
 import com.example.greenfoodsapp.Fragment.Bill.HistoryOrderFragment;
 
+// Nguyễn Đức Huy - 20145449
 public class OderViewPagerAdapter extends FragmentStateAdapter {
     public OderViewPagerAdapter(@NonNull Fragment fragment) {
         super(fragment);

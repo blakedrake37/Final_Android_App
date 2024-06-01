@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-
+// Nguyễn Đức Huy - 20145449
 public class CartActivity extends AppCompatActivity {
     private RecyclerView rvCart;
     private List<Cart> list;
@@ -58,14 +58,18 @@ public class CartActivity extends AppCompatActivity {
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#73DE4E")));
         getSupportActionBar().setTitle("Giỏ hàng");
         unitUi();
+
+        // Đặt sự kiện click cho nút gửi hóa đơn
         btn_senBill.setOnClickListener(view -> {
-        addBill();
-        for (int i = 0; i < list.size(); i++) {
-            addProductTop(list.get(i).getIdProduct(),list.get(i).getNumberProduct(),list.get(i).getIdCategory());
-        }
-        deleteCart();
+            addBill(); // Thêm hóa đơn
+            for (int i = 0; i < list.size(); i++) {
+                addProductTop(list.get(i).getIdProduct(),list.get(i).getNumberProduct(),list.get(i).getIdCategory()); // Cập nhật sản phẩm lên top
+            }
+            deleteCart(); // Xóa giỏ hàng
         });
     }
+
+    // Khởi tạo giao diện người dùng
     public void unitUi(){
         getVoucher();
         getProductTop();
@@ -73,18 +77,20 @@ public class CartActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter1 = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item,arr);
         spinner.setAdapter(adapter1);
         voucher = spinner.getSelectedItem().toString();
+
+        // Đặt sự kiện chọn item cho spinner
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 voucher = spinner.getSelectedItem().toString();
-                getCartProduct();
+                getCartProduct(); // Lấy danh sách sản phẩm trong giỏ hàng
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
             }
         });
+
         rvCart = findViewById(R.id.recyclerView_CartActivity_listCart);
         list = getCartProduct();
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -102,6 +108,7 @@ public class CartActivity extends AppCompatActivity {
         tvVoucher = findViewById(R.id.tvVoucher);
     }
 
+    // Lấy danh sách voucher từ Firebase
     public void getVoucher(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Voucher");
@@ -112,60 +119,50 @@ public class CartActivity extends AppCompatActivity {
                 for(DataSnapshot snap : snapshot.getChildren()){
                     Voucher voucher = snap.getValue(Voucher.class);
                     listVoucher.add(voucher);
-
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
-
     }
-    public  List<Cart> getCartProduct(){
-//        ProgressDialog progressDialog = new ProgressDialog(this);
-//        progressDialog.setMessage("Vui lòng đợi ...");
-//        progressDialog.setCanceledOnTouchOutside(false);
 
+    // Lấy danh sách sản phẩm trong giỏ hàng từ Firebase
+    public List<Cart> getCartProduct(){
         SharedPreferences preferences = getSharedPreferences("My_User",MODE_PRIVATE);
         String user = preferences.getString("username","");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Cart");
         List<Cart> list1 = new ArrayList<>();
-//        progressDialog.show();
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                progressDialog.dismiss();
                 list1.clear();
                 for(DataSnapshot snap : snapshot.getChildren()){
                     Cart cart = snap.getValue(Cart.class);
-                    if(cart!=null){
-                        if (cart.getUserClient().equals(user)){
-                            list1.add(cart);
-
-                        }
+                    if(cart!=null && cart.getUserClient().equals(user)){
+                        list1.add(cart);
                     }
-
-
                 }
                 int sum = 0;
-                for (int i = 0; i < list1.size(); i++) {
-                    sum += list1.get(i).getTotalPrice();
+                for (Cart cart : list1) {
+                    sum += cart.getTotalPrice();
+                }
+                // Áp dụng voucher giảm giá
+                if (voucher.equals("Giảm 50%")){
+                    sum = (int) (sum - sum * 0.5);
+                }else if (voucher.equals("Giảm 30%")){
+                    sum = (int) (sum - sum * 0.3);
+                }else if (voucher.equals("Giảm 20%")){
+                    sum = (int) (sum - sum * 0.2);
                 }
 
-                if (voucher.equals("Giảm 50%")){
-                    sum = (int) (sum-sum *0.5);
-                }else if (voucher.equals("Giảm 30%")){
-                    sum = (int) (sum-sum*0.3);
-                }else if (voucher.equals("Giảm 20%")){
-                    sum = (int) (sum-sum*0.2);
-                }else sum = sum;
-
                 tvTotalPrice.setText(numberFormat.format(sum));
-                tv1.setText(""+sum);
-                if(list1.size()==0){
+                tv1.setText("" + sum);
+
+                if(list1.isEmpty()){
+                    // Hiển thị thông báo khi giỏ hàng trống
                     tvHide1.setVisibility(View.GONE);
                     tvHide2.setVisibility(View.GONE);
                     btn_senBill.setVisibility(View.GONE);
@@ -180,6 +177,7 @@ public class CartActivity extends AppCompatActivity {
                     });
                     rvCart.setVisibility(View.INVISIBLE);
                 }else {
+                    // Hiển thị giỏ hàng
                     tvHide1.setVisibility(View.VISIBLE);
                     tvHide2.setVisibility(View.VISIBLE);
                     tvVoucher.setVisibility(View.VISIBLE);
@@ -188,20 +186,17 @@ public class CartActivity extends AppCompatActivity {
                     btnEmptyProduct.setVisibility(View.INVISIBLE);
                     rvCart.setVisibility(View.VISIBLE);
                 }
-                
                 adapter.notifyDataSetChanged();
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
         return list1;
     }
 
-
+    // Thêm hóa đơn vào Firebase
     public void addBill(){
         Bill bill = new Bill();
         SharedPreferences preferences = getSharedPreferences("My_User",MODE_PRIVATE);
@@ -212,47 +207,36 @@ public class CartActivity extends AppCompatActivity {
         String date = dateFormat.format(Calendar.getInstance().getTime());
         SimpleDateFormat timeFormat = new SimpleDateFormat("k:mm");
         String time = timeFormat.format(Calendar.getInstance().getTime());
-        if (listBill.size()==0){
+
+        if (listBill.isEmpty()){
             bill.setIdBill(1);
-            bill.setIdClient(user);
-            bill.setDayOut(date);
-            bill.setTimeOut(time);
-            bill.setIdPartner(list.get(0).getIdPartner());
-            bill.setTotal(Integer.parseInt(tv1.getText().toString()));
-            if (user.equals("admin")){
-                bill.setStatus("Yes");
-            }else bill.setStatus("No");
-            reference.child(""+1).setValue(bill);
-            reference.child(""+1).child("Cart").setValue(list);
-        }else {
-            int i = listBill.size()-1;
-            int id = listBill.get(i).getIdBill()+1;
+        } else {
+            int id = listBill.get(listBill.size() - 1).getIdBill() + 1;
             bill.setIdBill(id);
-            bill.setIdClient(user);
-            bill.setDayOut(date);
-            bill.setTimeOut(time);
-            bill.setIdPartner(list.get(0).getIdPartner());
-            bill.setTotal(Integer.parseInt(tv1.getText().toString()));
-            if (user.equals("admin")){
-                bill.setStatus("Yes");
-            }else bill.setStatus("No");
-            reference.child(""+id).setValue(bill);
-            reference.child(""+id).child("Cart").setValue(list);
         }
 
+        bill.setIdClient(user);
+        bill.setDayOut(date);
+        bill.setTimeOut(time);
+        bill.setIdPartner(list.get(0).getIdPartner());
+        bill.setTotal(Integer.parseInt(tv1.getText().toString()));
+        bill.setStatus(user.equals("admin") ? "Yes" : "No");
+        reference.child("" + bill.getIdBill()).setValue(bill);
+        reference.child("" + bill.getIdBill()).child("Cart").setValue(list);
     }
+
+    // Xóa giỏ hàng sau khi gửi hóa đơn
     public void deleteCart(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Cart");
-        for (int i = 0; i < list.size(); i++) {
-            reference.child(""+list.get(i).getIdCart()).removeValue();
+        for (Cart cart : list) {
+            reference.child("" + cart.getIdCart()).removeValue();
         }
-        if (list.size()==0){
-            btn_senBill.setEnabled(false);
-        }else  btn_senBill.setEnabled(true);
-
+        btn_senBill.setEnabled(!list.isEmpty());
     }
-    public  List<Bill> getAllBill(){
+
+    // Lấy danh sách hóa đơn từ Firebase
+    public List<Bill> getAllBill(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Bill");
         List<Bill> list1 = new ArrayList<>();
@@ -264,38 +248,39 @@ public class CartActivity extends AppCompatActivity {
                     Bill bill = snap.getValue(Bill.class);
                     list1.add(bill);
                 }
-
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
         return list1;
     }
 
-    public void addProductTop(int id, int amount,int category){
+    // Thêm sản phẩm vào danh sách sản phẩm bán chạy
+    public void addProductTop(int id, int amount, int category){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("ProductTop");
         ProductTop top = new ProductTop();
         top.setIdProduct(id);
         top.setIdCategory(category);
         top.setAmountProduct(amount);
-        if (listTop.size()==0){
-            reference.child(""+id).setValue(top);
-        }else {
-            for (int i = 0; i < listTop.size(); i++) {
-                if (id == listTop.get(i).getIdProduct()) {
-                    int amounts = listTop.get(i).getAmountProduct() + amount;
-                    reference.child("" + id).child("amountProduct").setValue(amounts);
+
+        if (listTop.isEmpty()){
+            reference.child("" + id).setValue(top);
+        } else {
+            for (ProductTop productTop : listTop) {
+                if (id == productTop.getIdProduct()) {
+                    int newAmount = productTop.getAmountProduct() + amount;
+                    reference.child("" + id).child("amountProduct").setValue(newAmount);
                     return;
-                } else {
-                    reference.child("" + id).setValue(top);
                 }
             }
+            reference.child("" + id).setValue(top);
         }
     }
 
+    // Lấy danh sách sản phẩm bán chạy từ Firebase
     public void getProductTop(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("ProductTop");
@@ -311,9 +296,7 @@ public class CartActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
-
 }

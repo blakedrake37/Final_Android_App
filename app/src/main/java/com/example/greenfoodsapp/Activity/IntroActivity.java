@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.example.greenfoodsapp.Adapter.SliderAdapter;
 import com.example.greenfoodsapp.R;
 
+
+// Ông Vũ Hữu Tài - 21110796
 public class IntroActivity extends AppCompatActivity {
 
     ViewPager viewPagerIntro;
@@ -35,25 +37,28 @@ public class IntroActivity extends AppCompatActivity {
 
         sliderAdapterIntro = new SliderAdapter(this);
         viewPagerIntro.setAdapter(sliderAdapterIntro);
-        addDots(0);
-        viewPagerIntro.addOnPageChangeListener(changeListener);
+        addDots(0); // Thêm các dấu chấm hiển thị vị trí của slider
+        viewPagerIntro.addOnPageChangeListener(changeListener); // Thêm sự kiện lắng nghe khi trang được thay đổi
 
         btn_started_intro.setOnClickListener(view -> {
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), MainActivity.class)); // Chuyển sang MainActivity khi bấm nút bắt đầu
         });
 
         getSupportActionBar().hide(); // Ẩn actionbar
     }
 
+    // Hàm bỏ qua intro và chuyển sang MainActivity
     public void skip(View view){
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
         finish();
     }
 
+    // Hàm chuyển sang trang tiếp theo của intro
     public void next(View view){
         viewPagerIntro.setCurrentItem(currentPos + 1);
     }
 
+    // Thêm các dấu chấm để hiển thị vị trí hiện tại của slider
     private void addDots(int position){
         dots = new TextView[3];
         dotsLayoutIntro.removeAllViews();
@@ -67,34 +72,32 @@ public class IntroActivity extends AppCompatActivity {
         }
 
         if (dots.length > 0){
-            dots[position].setTextColor(getResources().getColor(R.color.black));
+            dots[position].setTextColor(getResources().getColor(R.color.black)); // Đổi màu của dấu chấm tương ứng với trang hiện tại
         }
     }
 
+    // Sự kiện lắng nghe khi trang được thay đổi
     ViewPager.OnPageChangeListener changeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
         }
 
         @Override
         public void onPageSelected(int position) {
-            addDots(position);
+            addDots(position); // Cập nhật lại các dấu chấm khi trang thay đổi
             currentPos = position;
 
             if (position == 0){
-                btn_started_intro.setVisibility(View.INVISIBLE);
+                btn_started_intro.setVisibility(View.INVISIBLE); // Ẩn nút bắt đầu khi ở trang đầu tiên
             }else if (position == 1){
-                btn_started_intro.setVisibility(View.INVISIBLE);
+                btn_started_intro.setVisibility(View.INVISIBLE); // Ẩn nút bắt đầu khi ở trang thứ hai
             }else{
-                btn_started_intro.setVisibility(View.VISIBLE);
+                btn_started_intro.setVisibility(View.VISIBLE); // Hiển thị nút bắt đầu khi ở trang cuối cùng
             }
-
         }
 
         @Override
         public void onPageScrollStateChanged(int state) {
-
         }
     };
 }

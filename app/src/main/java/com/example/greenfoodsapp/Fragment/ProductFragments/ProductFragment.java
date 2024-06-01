@@ -49,6 +49,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import android.util.Base64;
 import java.util.List;
+
+// Lê Nguyễn Toàn Tâm - 21110797
 public class ProductFragment extends Fragment {
 
     private FragmentProductBinding binding;
@@ -57,14 +59,14 @@ public class ProductFragment extends Fragment {
     private ProductAdapter_tabLayout adapter_tabLayout;
     private FloatingActionButton fab_addProduct;
     private List<Product> listProduct = new ArrayList<>();
-    private TextInputLayout til_nameProduct,til_priceProduct;
+    private TextInputLayout til_nameProduct, til_priceProduct;
     private TextView tvErrorImg;
-    private ImageView img_Product,img_addImageCamera,img_addImageDevice;
-    private String nameProduct,imgProduct,userPartner,priceProduct,role;
+    private ImageView img_Product, img_addImageCamera, img_addImageDevice;
+    private String nameProduct, imgProduct, userPartner, priceProduct, role;
     private int codeCategory;
-    private Button btn_addVegetable,btn_cancleVegetable;
+    private Button btn_addVegetable, btn_cancleVegetable;
     private Spinner sp_nameCategory;
-    private String[] arr = {"Rau củ","Hoa quả","Thịt"};
+    private String[] arr = {"Rau củ", "Hoa quả", "Thịt"};
     private ArrayAdapter<String> adapterSpiner;
     private SharedPreferences sharedPreferences;
 
@@ -74,7 +76,7 @@ public class ProductFragment extends Fragment {
         tabLayout();
         initUI();
         fab_addProduct.setOnClickListener(view1 -> {
-            dialogProduct(new Product(),0,getContext());
+            dialogProduct(new Product(), 0, getContext());
         });
         return binding.getRoot();
     }
@@ -84,7 +86,9 @@ public class ProductFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-    public void tabLayout(){
+
+    // Thiết lập tab layout cho sản phẩm
+    public void tabLayout() {
         tabLayoutProduct = binding.tabProductFragment;
         viewPagerProduct = binding.viewPagerProductFragment;
         adapter_tabLayout = new ProductAdapter_tabLayout(this);
@@ -92,37 +96,42 @@ public class ProductFragment extends Fragment {
         new TabLayoutMediator(tabLayoutProduct, viewPagerProduct, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                switch (position){
-                    case 0: tab.setText("Rau củ");
+                switch (position) {
+                    case 0:
+                        tab.setText("Rau củ");
                         break;
-                    case 1: tab.setText("Hoa quả");
+                    case 1:
+                        tab.setText("Hoa quả");
                         break;
-                    case 2:tab.setText("Thịt");
+                    case 2:
+                        tab.setText("Thịt");
                         break;
-                    case 3:tab.setText("Đồ ăn ");
+                    case 3:
+                        tab.setText("Đồ ăn");
                         break;
                 }
             }
         }).attach();
     }
-    public void initUI(){
+
+    // Khởi tạo các thành phần UI
+    public void initUI() {
         getAllProducts();
         fab_addProduct = binding.fabAddProductFragment;
-
-
     }
 
-    public void dialogProduct(Product product,int type,Context context) {
-        sharedPreferences = context.getSharedPreferences("My_User",Context.MODE_PRIVATE);
-        role = sharedPreferences.getString("role","");
+    // Hiển thị dialog thêm sản phẩm
+    public void dialogProduct(Product product, int type, Context context) {
+        sharedPreferences = context.getSharedPreferences("My_User", Context.MODE_PRIVATE);
+        role = sharedPreferences.getString("role", "");
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Thêm sản phẩm");
-        View view = LayoutInflater.from(context).inflate(R.layout.dialog_product,null);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_product, null);
         builder.setView(view);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-        initUiDialog(view,context);
-        if (type ==0) {
+        initUiDialog(view, context);
+        if (type == 0) {
             img_addImageCamera.setOnClickListener(view1 -> {
                 requestPermissionCamera();
             });
@@ -137,14 +146,13 @@ public class ProductFragment extends Fragment {
                 alertDialog.dismiss();
             });
         }
-        if (type==1){
+        if (type == 1) {
             setData(product);
             img_addImageCamera.setVisibility(View.GONE);
-
             img_addImageDevice.setVisibility(View.GONE);
             btn_addVegetable.setOnClickListener(view1 -> {
                 getData(context);
-                if (validate(1)==1){
+                if (validate(1) == 1) {
                     product.setNameProduct(nameProduct);
                     product.setPriceProduct(Integer.parseInt(priceProduct));
                     product.setCodeCategory(codeCategory);
@@ -157,64 +165,65 @@ public class ProductFragment extends Fragment {
             });
         }
     }
-    public void initUiDialog(View view,Context context){
+
+    // Khởi tạo các thành phần UI trong dialog
+    public void initUiDialog(View view, Context context) {
         tvErrorImg = view.findViewById(R.id.error_img);
         img_Product = view.findViewById(R.id.imgProduct_dialog);
         img_addImageCamera = view.findViewById(R.id.img_addImageCamera_dialog);
         img_addImageDevice = view.findViewById(R.id.img_addImageDevice_dialog);
-        til_nameProduct =  view.findViewById(R.id.til_NameProduct_dialog);
-        til_priceProduct =  view.findViewById(R.id.til_PriceProduct_dialog);
-        btn_addVegetable =  view.findViewById(R.id.btn_addVegetable_dialog);
-        btn_cancleVegetable =  view.findViewById(R.id.btn_cancleVegetable_dialog);
+        til_nameProduct = view.findViewById(R.id.til_NameProduct_dialog);
+        til_priceProduct = view.findViewById(R.id.til_PriceProduct_dialog);
+        btn_addVegetable = view.findViewById(R.id.btn_addVegetable_dialog);
+        btn_cancleVegetable = view.findViewById(R.id.btn_cancleVegetable_dialog);
         sp_nameCategory = view.findViewById(R.id.sp_nameCategory);
-        adapterSpiner = new ArrayAdapter<>(context,android.R.layout.simple_spinner_dropdown_item,arr);
+        adapterSpiner = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, arr);
         sp_nameCategory.setAdapter(adapterSpiner);
-        if (!role.equals("admin")){
+        if (!role.equals("admin")) {
             sp_nameCategory.setVisibility(View.GONE);
         }
     }
 
-    public void setData(Product product){
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            byte[] imgByte = Base64.decode(product.getImgProduct(),Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imgByte,0,imgByte.length);
+    // Thiết lập dữ liệu cho sản phẩm
+    public void setData(Product product) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            byte[] imgByte = Base64.decode(product.getImgProduct(), Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
             img_Product.setImageBitmap(bitmap);
             til_nameProduct.getEditText().setText(product.getNameProduct());
             til_priceProduct.getEditText().setText(String.valueOf(product.getPriceProduct()));
         }
-
     }
 
-    public void getData(Context context){
+    // Lấy dữ liệu từ các thành phần UI trong dialog
+    public void getData(Context context) {
         nameProduct = til_nameProduct.getEditText().getText().toString();
         try {
-            Bitmap bitmap = ((BitmapDrawable)img_Product.getDrawable()).getBitmap();
+            Bitmap bitmap = ((BitmapDrawable) img_Product.getDrawable()).getBitmap();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] imgByte = outputStream.toByteArray();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                imgProduct = Base64.encodeToString(imgByte,Base64.DEFAULT);
+                imgProduct = Base64.encodeToString(imgByte, Base64.DEFAULT);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         SharedPreferences sharedPreferences = context.getSharedPreferences("My_User", Context.MODE_PRIVATE);
-        userPartner = sharedPreferences.getString("username","");
-
-                String category = sp_nameCategory.getSelectedItem().toString();
-                if (category.equals("Rau củ")){
-                    codeCategory = 1;
-                }else if (category.equals("Hoa quả")){
-                    codeCategory = 2;
-                }else  if (category.equals("Thịt")){
-                    codeCategory = 3;
-                }
-        priceProduct = til_priceProduct.getEditText().getText().toString();
-
+        userPartner = sharedPreferences.getString("username", "");
+        String category = sp_nameCategory.getSelectedItem().toString();
+        if (category.equals("Rau củ")) {
+            codeCategory = 1;
+        } else if (category.equals("Hoa quả")) {
+            codeCategory = 2;
+        } else if (category.equals("Thịt")) {
+            codeCategory = 3;
         }
+        priceProduct = til_priceProduct.getEditText().getText().toString();
+    }
 
-    public void setDataProduct(){
+    // Thiết lập dữ liệu cho sản phẩm mới
+    public void setDataProduct() {
         Product product = new Product();
         product.setUserPartner(userPartner);
         product.setCodeCategory(codeCategory);
@@ -224,17 +233,17 @@ public class ProductFragment extends Fragment {
         addProduct(product);
     }
 
+    // Chụp ảnh sản phẩm
     private void captureImage() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-       this.startActivityForResult(intent, 10);
+        this.startActivityForResult(intent, 10);
     }
+
+    // Mở thư viện ảnh
     private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         this.startActivityForResult(gallery, 100);
-
-
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -242,118 +251,126 @@ public class ProductFragment extends Fragment {
         if (requestCode == 10) {
             if (resultCode == RESULT_OK) {
                 Bitmap bp = (Bitmap) data.getExtras().get("data");
-                this. img_Product.setImageBitmap(bp);
-
+                this.img_Product.setImageBitmap(bp);
                 Uri imageUri = data.getData();
                 img_Product.setImageURI(imageUri);
             } else if (resultCode == RESULT_CANCELED) {
-
-            } else if (data!=null){
-
+                // Xử lý khi không chụp ảnh
+            } else if (data != null) {
+                // Xử lý khi có dữ liệu khác
             }
         }
         if (requestCode == 100) {
-            if (resultCode == RESULT_OK ) {
+            if (resultCode == RESULT_OK) {
                 Uri imageUri = data.getData();
                 this.img_Product.setImageURI(imageUri);
             }
         }
-
     }
 
-    public  void getAllProducts(){
+    // Lấy tất cả sản phẩm từ Firebase
+    public void getAllProducts() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Product");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listProduct.clear();
-                for(DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Product product = snap.getValue(Product.class);
                     listProduct.add(product);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Xử lý lỗi khi truy xuất dữ liệu thất bại
             }
         });
     }
 
-
-    public void addProduct(Product product){
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference reference = database.getReference("Product");
-            if (listProduct.size() == 0) {
-                product.setCodeProduct(1);
-                reference.child("1").setValue(product);
-
-            } else {
-                int i = listProduct.size() - 1;
-                int id = listProduct.get(i).getCodeProduct() + 1;
-                product.setCodeProduct(id);
-                reference.child("" + id).setValue(product);
-            }
-    }
-    public void updateProduct(Product product){
+    // Thêm sản phẩm vào Firebase
+    public void addProduct(Product product) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Product");
-        reference.child(""+product.getCodeProduct()).child("nameProduct").setValue(product.getNameProduct());
-        reference.child(""+product.getCodeProduct()).child("priceProduct").setValue(product.getPriceProduct());
-//        if (!role.equals("admin")){
-//            reference.child(""+product.getCodeProduct()).child("codeCategory").setValue("4");
-//        }else {
-//            reference.child(""+product.getCodeProduct()).child("codeCategory").setValue(product.getCodeCategory());
-//        }
-
+        if (listProduct.size() == 0) {
+            product.setCodeProduct(1);
+            reference.child("1").setValue(product);
+        } else {
+            int i = listProduct.size() - 1;
+            int id = listProduct.get(i).getCodeProduct() + 1;
+            product.setCodeProduct(id);
+            reference.child("" + id).setValue(product);
+        }
     }
-    public void deleteProduct(Product product){
+
+    // Cập nhật sản phẩm trên Firebase
+    public void updateProduct(Product product) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Product");
-        reference.child(""+product.getCodeProduct()).removeValue();
+        reference.child("" + product.getCodeProduct()).child("nameProduct").setValue(product.getNameProduct());
+        reference.child("" + product.getCodeProduct()).child("priceProduct").setValue(product.getPriceProduct());
     }
-    public boolean isEmptys(String str,TextInputLayout til){
-        if (str.isEmpty()){
+
+    // Xóa sản phẩm khỏi Firebase
+    public void deleteProduct(Product product) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference("Product");
+        reference.child("" + product.getCodeProduct()).removeValue();
+    }
+
+    // Kiểm tra trường dữ liệu không được để trống
+    public boolean isEmptys(String str, TextInputLayout til) {
+        if (str.isEmpty()) {
             til.setError("Không được để trống");
-            Log.d("ProductFragment","lỗi");
+            Log.d("ProductFragment", "lỗi");
             return false;
-        }else til.setError(null);
+        } else til.setError(null);
         return true;
     }
-    public boolean errorImg(String str, TextView tv){
-        if (str != null){
+
+    // Kiểm tra lỗi ảnh
+    public boolean errorImg(String str, TextView tv) {
+        if (str != null) {
             tv.setText("");
             return true;
-        }else {
+        } else {
             tv.setText("Ảnh không được để trống");
             return false;
         }
     }
-    public int validate(int type){
+
+    // Kiểm tra dữ liệu nhập vào
+    public int validate(int type) {
         if (type == 0) {
             if (isEmptys(nameProduct, til_nameProduct) && isEmptys(priceProduct, til_priceProduct) && errorImg(imgProduct, tvErrorImg)) {
                 setDataProduct();
                 removeAll();
                 return 0;
             }
-        }else if (type==1){
+        } else if (type == 1) {
             if (isEmptys(nameProduct, til_nameProduct) && isEmptys(priceProduct, til_priceProduct) && errorImg(imgProduct, tvErrorImg)) {
                 return 1;
             }
         }
         return 2;
     }
-    public void removeAll(){
+
+    // Xóa dữ liệu sau khi thêm hoặc cập nhật sản phẩm
+    public void removeAll() {
         til_nameProduct.getEditText().setText("");
         til_priceProduct.getEditText().setText("");
         img_Product.setImageResource(R.drawable.ic_menu_camera1);
     }
-    public void requestPermissionCamera(){
+
+    // Yêu cầu quyền truy cập camera
+    public void requestPermissionCamera() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
                 captureImage();
             }
+
             @Override
             public void onPermissionDenied(List<String> deniedPermissions) {
                 requestPermissionCamera();
@@ -361,11 +378,13 @@ public class ProductFragment extends Fragment {
         };
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn không cấp quyền,bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
+                .setDeniedMessage("Nếu bạn không cấp quyền, bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
                 .setPermissions(Manifest.permission.CAMERA)
                 .check();
     }
-    public void requestPermissionDevice(){
+
+    // Yêu cầu quyền truy cập thư viện ảnh
+    public void requestPermissionDevice() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -379,7 +398,7 @@ public class ProductFragment extends Fragment {
         };
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn không cấp quyền,bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng" )
+                .setDeniedMessage("Nếu bạn không cấp quyền, bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
                 .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }

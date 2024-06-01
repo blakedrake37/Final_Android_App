@@ -23,14 +23,15 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+// Nguyễn Đức Huy - 20145449
 public class SearchActivity extends AppCompatActivity {
     private List<Product> listProduct = new ArrayList<>();
     private RecyclerView rvProduct;
     private LinearLayoutManager linearLayoutManager;
     private ProductAdapter adapter;
-
-    private ProductFragment fragment= new ProductFragment();
+    private ProductFragment fragment = new ProductFragment();
     private SearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +39,9 @@ public class SearchActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Tìm kiếm sản phẩm");
         initUI();
     }
-    public void initUI(){
+
+    // Hàm khởi tạo giao diện người dùng
+    public void initUI() {
         searchView = findViewById(R.id.searchProduct);
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -47,6 +50,7 @@ public class SearchActivity extends AppCompatActivity {
                 return false;
             }
 
+            // Xử lý khi nội dung tìm kiếm thay đổi
             @Override
             public boolean onQueryTextChange(String newText) {
                 searchProduct(newText);
@@ -57,42 +61,42 @@ public class SearchActivity extends AppCompatActivity {
         rvProduct = findViewById(R.id.rvSearch);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         rvProduct.setLayoutManager(linearLayoutManager);
-        adapter = new ProductAdapter(listProduct,fragment, getApplicationContext());
+        adapter = new ProductAdapter(listProduct, fragment, getApplicationContext());
         rvProduct.setAdapter(adapter);
         rvProduct.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
     }
+
+    // Hàm tìm kiếm sản phẩm dựa trên từ khóa
     private void searchProduct(String str) {
         List<Product> searchList = new ArrayList<>();
-        for (Product product : listProduct){
-            if (product.getNameProduct().toLowerCase().contains(str.toLowerCase())){
+        for (Product product : listProduct) {
+            if (product.getNameProduct().toLowerCase().contains(str.toLowerCase())) {
                 searchList.add(product);
             }
         }
-        if (searchList.isEmpty()){
+        if (searchList.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Không có sản phẩm", Toast.LENGTH_SHORT).show();
-            adapter = new ProductAdapter(searchList, fragment, getApplicationContext());
-            rvProduct.setAdapter(adapter);
-        }else {
-            adapter = new ProductAdapter(searchList, fragment, getApplicationContext());
-            rvProduct.setAdapter(adapter);
         }
-        if (str.equals("")){
+        adapter = new ProductAdapter(searchList, fragment, getApplicationContext());
+        rvProduct.setAdapter(adapter);
+
+        if (str.equals("")) {
             adapter = new ProductAdapter(listProduct, fragment, getApplicationContext());
             rvProduct.setAdapter(adapter);
         }
     }
-    public  void getVegetableProduct(){
+
+    // Hàm lấy danh sách sản phẩm từ Firebase
+    public void getVegetableProduct() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Product");
-        //TODO sửa dialog khi load dữ liệu từ firebase lên fragment
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listProduct.clear();
-                for(DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Product product = snap.getValue(Product.class);
-                        listProduct.add(product);
-
+                    listProduct.add(product);
                 }
                 adapter.notifyDataSetChanged();
             }

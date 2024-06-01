@@ -45,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+// Ông Vũ Hữu Tài - 21110796
 public class ProfileFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "ProfileFragment";
     private ProfileViewModel profileViewModel;
@@ -75,20 +76,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         Log.d(TAG, "onCreateView: start");
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        initUI();
-//        setUserInfoToView();
+        initUI(); // Khởi tạo các thành phần giao diện
         Log.d(TAG, "onCreateView: end");
         return root;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initListener();
-        if (user != null) showUserInformation();
-        else if (partner != null) showPartnerInformation();
-//        ivAvatar.setImageBitmap(user.getBitmapAvatar());
+        initListener(); // Khởi tạo các sự kiện listener
+        if (user != null) showUserInformation(); // Hiển thị thông tin người dùng
+        else if (partner != null) showPartnerInformation(); // Hiển thị thông tin đối tác
     }
 
+    // Hiển thị thông tin đối tác
     private void showPartnerInformation() {
         Log.d(TAG, "showPartnerInformation: start");
         profileViewModel.getBitmapLiveData().observe(getViewLifecycleOwner(), new Observer<Bitmap>() {
@@ -106,7 +107,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             public void onChanged(Partner partner) {
                 try {
                     mLayoutName.getEditText().setText(partner.getNamePartner());
-//                mLayoutEmail.getEditText().setText(String.valueOf(partner.getIdPartner()));
                     mLayoutAddress.getEditText().setText(partner.getAddressPartner());
                     mLayoutPhoneNumber.getEditText().setText(partner.getUserPartner());
                     byte[] decodeString = Base64.decode(partner.getImgPartner(), Base64.DEFAULT);
@@ -115,13 +115,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             .signature(new ObjectKey(System.currentTimeMillis()))
                             .into(ivAvatar);
                     Log.d(TAG, "onChanged() returned: " + "ảnh được lấy từ storage về");
-//                Glide.with(getActivity()).load(user.getBitmapAvatar()).error(R.drawable.ic_avatar_default).into(ivAvatar);
-                    Log.d(TAG, "onChanged: ");
                     Log.d(TAG, "onChanged: " + partner.toString());
                 } catch (Exception e) {
                     Log.e(TAG, "onChanged: ", e);
                 }
-
             }
         });
         Log.d(TAG, "showPartnerInformation: end");
@@ -132,18 +129,23 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         super.onDestroyView();
         binding = null;
     }
+
+    // Khởi tạo các thành phần UI
     private void initUI() {
         ivAvatar = binding.getRoot().findViewById(R.id.iv_profile_fragment_avatar);
         btnUpdateInfoUser = binding.getRoot().findViewById(R.id.btn_profile_fragment_update);
-//        mLayoutEmail = binding.getRoot().findViewById(R.id.text_input_layout_profile_fragment_email);
         mLayoutName = binding.getRoot().findViewById(R.id.text_input_layout_profile_fragment_full_name);
         mLayoutAddress = binding.getRoot().findViewById(R.id.text_input_layout_profile_fragment_address);
         mLayoutPhoneNumber = binding.getRoot().findViewById(R.id.text_input_layout_profile_fragment_phone_number);
     }
+
+    // Khởi tạo các listener cho các nút bấm
     private void initListener() {
         ivAvatar.setOnClickListener(this::onClick);
         btnUpdateInfoUser.setOnClickListener(this::onClick);
     }
+
+    // Hiển thị thông tin người dùng
     public void showUserInformation() {
         Log.d(TAG, "showUserInformation: start");
         profileViewModel.getBitmapLiveData().observe(getViewLifecycleOwner(), new Observer<Bitmap>() {
@@ -160,7 +162,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onChanged(User user) {
                 mLayoutName.getEditText().setText(user.getName());
-//                mLayoutEmail.getEditText().setText(user.getEmail());
                 mLayoutAddress.getEditText().setText(user.getAddress());
                 mLayoutPhoneNumber.getEditText().setText(user.getPhoneNumber());
                 if (user.getBitmapAvatar() != null) {
@@ -178,8 +179,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             .into(ivAvatar);
                     Log.d(TAG, "onChanged() returned: " + "ảnh được lấy từ storage về");
                 }
-//                Glide.with(getActivity()).load(user.getBitmapAvatar()).error(R.drawable.ic_avatar_default).into(ivAvatar);
-                Log.d(TAG, "onChanged: ");
                 Log.d(TAG, "onChanged: " + user.toString());
             }
         });
@@ -191,17 +190,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.iv_profile_fragment_avatar:
                 Log.d(TAG, "onClick: click imageview");
-                onClickRequestPermission();
+                onClickRequestPermission(); // Yêu cầu quyền truy cập bộ nhớ
                 break;
             case R.id.btn_profile_fragment_update:
                 Log.d(TAG, "onClick: click btn update");
-                if(user != null) updateUserInfo();
-                else if (partner != null) updatePartnerInfo();
+                if(user != null) updateUserInfo(); // Cập nhật thông tin người dùng
+                else if (partner != null) updatePartnerInfo(); // Cập nhật thông tin đối tác
                 else Log.d(TAG, "onClick: không có đối tượng để update");
                 break;
         }
     }
 
+    // Cập nhật thông tin đối tác
     private void updatePartnerInfo() {
         Log.d(TAG, "updatePartnerInfo: start");
         partner.setNamePartner(mLayoutName.getEditText().getText().toString());
@@ -229,19 +229,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    // Yêu cầu quyền truy cập bộ nhớ
     private void onClickRequestPermission() {
         MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity == null) {
             Log.d(TAG, "onClickRequestPermission: android 6.0");
             return;
         }
-        //check version < android 6.0
+        // Kiểm tra phiên bản < android 6.0
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mainActivity.openGallery();
             Log.d(TAG, "onClickRequestPermission: android > 6.0");
             return;
         }
-        //check user permission when version >= android 6.0
+        // Kiểm tra quyền khi phiên bản >= android 6.0
         if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
             mainActivity.openGallery();
@@ -250,6 +251,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             getActivity().requestPermissions(permission, MY_REQUEST_CODE);
         }
     }
+
+    // Cập nhật thông tin người dùng
     private void updateUserInfo() {
         Log.d(TAG, "updateUserInfo: start");
 
@@ -269,14 +272,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
+                // Xử lý khi upload thất bại
                 Log.d(TAG, "onFailure: ");
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                // ...
+                // Xử lý khi upload thành công
                 spaceRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -295,11 +297,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         });
                     }
                 });
-                //user.setUriAvatar(spaceRef.getDownloadUrl().getResult());
-
             }
         });
-
     }
-
 }

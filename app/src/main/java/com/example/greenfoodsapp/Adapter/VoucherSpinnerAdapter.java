@@ -14,13 +14,13 @@ import com.example.greenfoodsapp.Model.Voucher;
 import com.example.greenfoodsapp.R;
 
 import java.util.List;
-
+// Ông Vũ Hữu Tài - 21110796
 public class VoucherSpinnerAdapter extends ArrayAdapter<Voucher> {
-    Context context;
-    List<Voucher> arrayList;
-    TextView tvCodeVoucher,idVoucher;
+    private Context context;
+    private List<Voucher> arrayList;
+    private TextView tvCodeVoucher, idVoucher;
 
-
+    // Constructor nhận context và danh sách voucher
     public VoucherSpinnerAdapter(@NonNull Context context, List<Voucher> arrayList) {
         super(context, 0, arrayList);
         this.context = context;
@@ -29,27 +29,32 @@ public class VoucherSpinnerAdapter extends ArrayAdapter<Voucher> {
 
     @NonNull
     @Override
+    // Hàm getView để tạo view hiển thị cho spinner
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if(convertView==null){
-            convertView = LayoutInflater.from(context).inflate(R.layout.spinner_voucher,null);
-            tvCodeVoucher = convertView.findViewById(R.id.tvCodeVoucher);
-            idVoucher = convertView.findViewById(R.id.idVoucher);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.spinner_voucher, null);
         }
-        tvCodeVoucher.setText(String.valueOf(arrayList.get(position).getCodeVoucher()));
-        idVoucher.setText(String.valueOf(arrayList.get(position).getIdVoucher()));
+        tvCodeVoucher = convertView.findViewById(R.id.tvCodeVoucher);
+        idVoucher = convertView.findViewById(R.id.idVoucher);
+
+        Voucher voucher = arrayList.get(position);
+        tvCodeVoucher.setText(String.valueOf(voucher.getCodeVoucher()));
+        idVoucher.setText(String.valueOf(voucher.getIdVoucher()));
         return convertView;
     }
 
     @Override
+    // Hàm getDropDownView để tạo view hiển thị cho dropdown của spinner
     public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if(convertView==null){
-            convertView = LayoutInflater.from(context).inflate(R.layout.spinner_voucher,null);
-            tvCodeVoucher = convertView.findViewById(R.id.tvCodeVoucher);
-            idVoucher = convertView.findViewById(R.id.idVoucher);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.spinner_voucher, null);
         }
-        tvCodeVoucher.setText(String.valueOf(arrayList.get(position).getCodeVoucher()));
-        idVoucher.setText(String.valueOf(arrayList.get(position).getIdVoucher()));
-        return convertView;
+        tvCodeVoucher = convertView.findViewById(R.id.tvCodeVoucher);
+        idVoucher = convertView.findViewById(R.id.idVoucher);
 
+        Voucher voucher = arrayList.get(position);
+        tvCodeVoucher.setText(String.valueOf(voucher.getCodeVoucher()));
+        idVoucher.setText(String.valueOf(voucher.getIdVoucher()));
+        return convertView;
     }
 }

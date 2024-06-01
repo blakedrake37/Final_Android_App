@@ -25,34 +25,38 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
+// Lê Nguyễn Toàn Tâm - 21110797
 public class FruitFragment extends Fragment {
 
-    private List<Product> listFruit = new ArrayList<>();
-    private RecyclerView rvFruit;
-    private LinearLayoutManager linearLayoutManager;
-    private ProductAdapter adapter;
-    private View view;
-    private ProductFragment fragment = new ProductFragment();
+    private List<Product> listFruit = new ArrayList<>(); // Danh sách sản phẩm trái cây
+    private RecyclerView rvFruit; // RecyclerView để hiển thị danh sách sản phẩm trái cây
+    private LinearLayoutManager linearLayoutManager; // LayoutManager cho RecyclerView
+    private ProductAdapter adapter; // Adapter cho RecyclerView
+    private View view; // View của Fragment
+    private ProductFragment fragment = new ProductFragment(); // Fragment sản phẩm
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Khởi tạo view và các UI components
         view = inflater.inflate(R.layout.fragment_fruit, container, false);
         unitUI();
 
         return view;
     }
+
+    // Khởi tạo UI
     public void unitUI(){
         getVegetableProducts();
         rvFruit = view.findViewById(R.id.rvFruit);
         linearLayoutManager = new LinearLayoutManager(getContext());
         rvFruit.setLayoutManager(linearLayoutManager);
-        adapter = new ProductAdapter(listFruit,fragment,getContext());
+        adapter = new ProductAdapter(listFruit, fragment, getContext());
         rvFruit.setAdapter(adapter);
         rvFruit.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }
 
+    // Lấy danh sách sản phẩm trái cây từ Firebase
     public void getVegetableProducts(){
         ProgressDialog progressDialog = new ProgressDialog(requireContext());
         progressDialog.setMessage("Vui lòng đợi ...");
@@ -65,9 +69,9 @@ public class FruitFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 progressDialog.dismiss();
                 listFruit.clear();
-                for(DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Product product = snap.getValue(Product.class);
-                    if (product.getCodeCategory()==2){
+                    if (product.getCodeCategory() == 2) {
                         listFruit.add(product);
                     }
                 }

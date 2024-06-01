@@ -1,5 +1,6 @@
 package com.example.greenfoodsapp.Model;
 
+// Ông Vũ Hữu Tài - 21110796
 public class ProductTop {
     private int idProduct,amountProduct,idCategory;
 

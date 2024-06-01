@@ -35,7 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
+// Nguyễn Đức Huy - 20145449
 public class CurrentOrderFragment extends Fragment {
 
     private RecyclerView rvBill;
@@ -51,48 +51,54 @@ public class CurrentOrderFragment extends Fragment {
         initUi(view);
         return view;
     }
-    public void initUi(View view ){
+
+    // Hàm khởi tạo giao diện người dùng
+    public void initUi(View view) {
         getBill();
         rvBill = view.findViewById(R.id.rv_billCurrent);
         linearLayoutManager = new LinearLayoutManager(getContext());
         rvBill.setLayoutManager(linearLayoutManager);
-        adapterBill = new AdapterBill(listBill,getContext());
+        adapterBill = new AdapterBill(listBill, getContext());
         rvBill.setAdapter(adapterBill);
     }
-    public void getBill(){
+
+    // Hàm lấy dữ liệu hóa đơn từ Firebase
+    public void getBill() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Bill");
         SharedPreferences preferences = getContext().getSharedPreferences("My_User", Context.MODE_PRIVATE);
-        String user = preferences.getString("username","");
+        String user = preferences.getString("username", "");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listBill.clear();
 
-                for (DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Bill bill = snap.getValue(Bill.class);
                     if (user.equals(bill.getIdPartner()) && bill.getStatus().equals("No")) {
                         listBill.add(bill);
-                    }else if (user.equals(bill.getIdClient()) && bill.getStatus().equals("No")){
+                    } else if (user.equals(bill.getIdClient()) && bill.getStatus().equals("No")) {
                         listBill.add(bill);
                     }
                 }
                 adapterBill.notifyDataSetChanged();
+                notification(); // Gọi hàm thông báo khi có dữ liệu mới
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Xử lý lỗi khi hủy lấy dữ liệu từ Firebase
             }
         });
     }
-    public  void notification(){
-        String CHANNEL_ID="1234";
 
-        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ getContext().getPackageName() + "/" + R.raw.sound);
+    // Hàm tạo và hiển thị thông báo
+    public void notification() {
+        String CHANNEL_ID = "1234";
+
+        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/" + R.raw.sound);
         NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-        //For API 26+ you need to put some additional code like below:
         NotificationChannel mChannel;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mChannel = new NotificationChannel(CHANNEL_ID, "Thông báo", NotificationManager.IMPORTANCE_HIGH);
@@ -104,27 +110,23 @@ public class CurrentOrderFragment extends Fragment {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
             mChannel.setSound(soundUri, audioAttributes);
-            mChannel.setVibrationPattern( new long []{ 100 , 200 , 300 , 400 , 500 , 400 , 300 , 200 , 400 }) ;
+            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
             if (mNotificationManager != null) {
-                mNotificationManager.createNotificationChannel( mChannel );
+                mNotificationManager.createNotificationChannel(mChannel);
             }
         }
 
-        //General code:
-        NotificationCompat.Builder status = new NotificationCompat.Builder(getContext(),CHANNEL_ID);
+        NotificationCompat.Builder status = new NotificationCompat.Builder(getContext(), CHANNEL_ID);
         status.setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                //.setOnlyAlertOnce(true)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("Bạn có đơn hàng mới")
-                .setDefaults(Notification.DEFAULT_LIGHTS )
-                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +getContext().getPackageName()+"/"+R.raw.sound))
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/" + R.raw.sound))
                 .build();
 
-
-        mNotificationManager.notify((int)System.currentTimeMillis(), status.build());
-
+        mNotificationManager.notify((int) System.currentTimeMillis(), status.build());
     }
 }

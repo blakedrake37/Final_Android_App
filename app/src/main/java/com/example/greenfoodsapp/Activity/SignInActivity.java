@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+// Ông Vũ Hữu Tài - 21110796
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
     private final String TAG = "SignInActivity";
     private LinearLayout layoutSignUp;
@@ -49,12 +50,13 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().hide();
     }
 
+    // Thiết lập các sự kiện khi nhấn vào các nút
     private void setOnclickListener() {
         layoutSignUp.setOnClickListener(this::onClick);
         btnSignIn.setOnClickListener(this::onClick);
     }
 
-
+    // Khởi tạo giao diện người dùng
     private void initUI() {
         layoutSignUp = findViewById(R.id.layout_SignInActivity_signIn);
         btnSignIn = findViewById(R.id.btn_SignInActivity_signIn);
@@ -68,6 +70,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         setOnclickListener();
     }
 
+    // Xử lý sự kiện nhấn vào các nút
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -87,6 +90,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    // Đăng nhập người dùng
     private void userLogin() {
         formEmail.setError(null);
         formPassword.setError(null);
@@ -127,9 +131,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 });
     }
 
-
+    // Đăng nhập đối tác hoặc admin
     public boolean logins(){
-        //TODO validate partner login
         String email = formEmail.getEditText().getText().toString().trim();
         String password = formPassword.getEditText().getText().toString().trim();
         for (int i = 0; i < list.size(); i++) {
@@ -151,6 +154,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         return false;
     }
 
+    // Ghi nhớ thông tin đăng nhập
     public void remember(String role, String id){
         String email = formEmail.getEditText().getText().toString().trim();
         String password = formPassword.getEditText().getText().toString().trim();
@@ -164,6 +168,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         editor.apply();
     }
 
+    // Lấy dữ liệu từ SharedPreferences
     public void getDataSpf(){
         SharedPreferences sharedPreferences = getSharedPreferences("My_User",MODE_PRIVATE);
         boolean isRemember = sharedPreferences.getBoolean("remember",false);
@@ -173,6 +178,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    // Kiểm tra thông tin đăng nhập hợp lệ
     private boolean validate(String email, String password) {
         try {
             if (email.isEmpty() && password.isEmpty()) throw new IllegalArgumentException("email and password is empty");
@@ -194,8 +200,9 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             return false;
         }
         return true;
-
     }
+
+    // Lấy danh sách tất cả đối tác từ Firebase
     public List<Partner> getAllPartner(){
         ProgressDialog progressDialog = new ProgressDialog(this);
         FirebaseDatabase database = FirebaseDatabase.getInstance();

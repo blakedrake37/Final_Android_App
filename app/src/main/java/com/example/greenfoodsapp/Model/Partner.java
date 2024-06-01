@@ -3,6 +3,7 @@ package com.example.greenfoodsapp.Model;
 import java.util.HashMap;
 import java.util.Map;
 
+// Lê Nguyễn Toàn Tâm - 21110797
 public class Partner {
     private int idPartner;
     private String namePartner,addressPartner,userPartner,passwordPartner,imgPartner;

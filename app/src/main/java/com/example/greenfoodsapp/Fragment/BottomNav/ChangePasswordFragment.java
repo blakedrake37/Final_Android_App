@@ -33,7 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.Map;
-
+// Ông Vũ Hữu Tài - 21110796
 public class ChangePasswordFragment extends Fragment {
     private final String TAG = "ChangePasswordFragment";
     private FragmentChangePasswordBinding binding;
@@ -58,15 +58,16 @@ public class ChangePasswordFragment extends Fragment {
         initListener();
     }
 
+    // Khởi tạo lắng nghe sự kiện cho các nút
     private void initListener() {
         if (mPartner != null) {
             changePasswordPartner();
         } else if (mUser != null) {
             changePasswordUser();
         }
-
     }
 
+    // Thay đổi mật khẩu đối tác
     private void changePasswordPartner() {
         oldPass.setErrorEnabled(true);
         newPass.setErrorEnabled(true);
@@ -85,8 +86,7 @@ public class ChangePasswordFragment extends Fragment {
 
                 mPartner.setPasswordPartner(strNewPass);
                 Log.d(TAG, "changePass: change password");
-                DatabaseReference mDatabase;
-                mDatabase = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                 Map<String, Object> partnerValue = mPartner.toMap();
                 Map<String, Object> partnerUpdateValue = new HashMap<>();
                 partnerUpdateValue.put("/Partner/" + mPartner.getIdPartner(), partnerValue);
@@ -103,11 +103,9 @@ public class ChangePasswordFragment extends Fragment {
                         Toast.makeText(requireContext(), "Đổi mật khẩu thành công", Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
             } catch (NullPointerException e) {
                 progressDialog.dismiss();
-                    if (e.getMessage().equals(FIELDS_EMPTY)) {
+                if (e.getMessage().equals(FIELDS_EMPTY)) {
                     setErrorEmpty();
                 } else {
                     Log.e(TAG, "signUp: ", e);
@@ -132,6 +130,7 @@ public class ChangePasswordFragment extends Fragment {
         });
     }
 
+    // Thay đổi mật khẩu người dùng
     private void changePasswordUser() {
         oldPass.setErrorEnabled(true);
         newPass.setErrorEnabled(true);
@@ -147,8 +146,7 @@ public class ChangePasswordFragment extends Fragment {
                 validate(strOldPass, strNewPass, strConfirmPass, mUser.getPassword());
                 mUser.setPassword(strNewPass);
                 Log.d(TAG, "changePass: change password");
-                DatabaseReference mDatabase;
-                mDatabase = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                 Map<String, Object> userValue = mUser.toMap();
                 Map<String, Object> userUpdateValue = new HashMap<>();
                 userUpdateValue.put("/User/" + mUser.getId(), userValue);
@@ -189,30 +187,31 @@ public class ChangePasswordFragment extends Fragment {
         });
     }
 
+    // Thiết lập lỗi cho các trường trống
     private void setErrorEmpty() {
         if (oldPass.getEditText().getText().toString().isEmpty()) oldPass.setError("Không được để trống");
         if (newPass.getEditText().getText().toString().isEmpty()) newPass.setError("Không được để trống");
         if (reNewPass.getEditText().getText().toString().isEmpty()) reNewPass.setError("Không được để trống");
-
     }
 
-
+    // Khởi tạo ViewModel để lấy thông tin đối tác hoặc người dùng
     private void initViewModel() {
         mProfileFragment = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         mPartner = mProfileFragment.getPartner().getValue();
         mUser = mProfileFragment.getUser().getValue();
     }
 
-    public void initUi(){
+    // Khởi tạo giao diện người dùng
+    public void initUi() {
         oldPass = binding.textChangePasswordFragmentOldPass;
         newPass = binding.textChangePasswordFragmentNewPass;
         reNewPass = binding.textChangePasswordFragmentReNewPass;
         btnChangePass = binding.btnChangePasswordFragmentChange;
     }
-    @Deprecated
-    public boolean validate(){
-        if (oldPass.getEditText().getText().toString().isEmpty() && newPass.getEditText().getText().toString().isEmpty() && reNewPass.getEditText().getText().toString().isEmpty()){
 
+    @Deprecated
+    public boolean validate() {
+        if (oldPass.getEditText().getText().toString().isEmpty() && newPass.getEditText().getText().toString().isEmpty() && reNewPass.getEditText().getText().toString().isEmpty()) {
             oldPass.setError("không được để trống");
             newPass.setError("không được để trống");
             reNewPass.setError("không được để trống");
@@ -222,24 +221,24 @@ public class ChangePasswordFragment extends Fragment {
             newPass.setError(null);
             reNewPass.setError(null);
         }
-        if (oldPass.getEditText().getText().toString().isEmpty()){
+        if (oldPass.getEditText().getText().toString().isEmpty()) {
             oldPass.setError("không được để trống");
             return false;
         } else {
             oldPass.setError(null);
         }
 
-        if (newPass.getEditText().getText().toString().isEmpty()){
+        if (newPass.getEditText().getText().toString().isEmpty()) {
             newPass.setError("không được để trống");
             return false;
         } else {
             newPass.setError(null);
         }
 
-        if (reNewPass.getEditText().getText().toString().isEmpty()){
+        if (reNewPass.getEditText().getText().toString().isEmpty()) {
             reNewPass.setError("không được để trống");
             return false;
-        } else if (!reNewPass.getEditText().getText().toString().equals(newPass.getEditText().getText().toString())){
+        } else if (!reNewPass.getEditText().getText().toString().equals(newPass.getEditText().getText().toString())) {
             reNewPass.setError("Mật khẩu nhập lại không trùng khớp");
             return false;
         } else {
@@ -247,6 +246,8 @@ public class ChangePasswordFragment extends Fragment {
         }
         return true;
     }
+
+    // Xác thực thông tin đầu vào
     private void validate(String oldPasswordInput,
                           String newPassword,
                           String ConfirmPassword,
@@ -255,7 +256,7 @@ public class ChangePasswordFragment extends Fragment {
                 newPassword.isEmpty() ||
                 ConfirmPassword.isEmpty())
             throw new NullPointerException(FIELDS_EMPTY);
-        if (newPassword.length() < 6) throw  new IllegalArgumentException(PASSWORD_INVALID);
+        if (newPassword.length() < 6) throw new IllegalArgumentException(PASSWORD_INVALID);
         if (!ConfirmPassword.equals(newPassword)) throw new IllegalArgumentException(PASSWORD_NOT_MATCH);
         if (newPassword.equals(oldPasswordInput)) throw new IllegalArgumentException(PASSWORD_INVALID_2);
         if (!oldPasswordInput.equals(oldPasswordAccount)) throw new IllegalArgumentException(PASSWORD_INVALID_3);

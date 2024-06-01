@@ -2,6 +2,7 @@ package com.example.greenfoodsapp.Model;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+// Ông Vũ Hữu Tài - 21110796
 public class FavoviteModel {
 
 //    private List<String> favoriteList;

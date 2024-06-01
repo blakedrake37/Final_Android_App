@@ -3,6 +3,7 @@ package com.example.greenfoodsapp.Model;
 import java.util.HashMap;
 import java.util.Map;
 
+// Nguyễn Đức Huy - 20145449
 public class Voucher {
     private int idVoucher;
     private double codeVoucher_double;

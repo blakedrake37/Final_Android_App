@@ -22,10 +22,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -52,7 +51,6 @@ import com.example.greenfoodsapp.Model.User;
 import com.example.greenfoodsapp.R;
 import com.example.greenfoodsapp.Service.ConnectionReceiver;
 import com.example.greenfoodsapp.databinding.ActivityMainBinding;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -64,8 +62,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class MainActivity extends AppCompatActivity{
+// Ông Vũ Hữu Tài - 21110796
+// Lê Nguyễn Toàn Tâm - 21110797
+// Nguyễn Đức Huy - 20145449
+public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     public static final int MY_REQUEST_CODE = 10;
 
@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity{
 
     ConnectionReceiver connectionReceiver = new ConnectionReceiver();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,12 +96,14 @@ public class MainActivity extends AppCompatActivity{
         initUI();
         initViewModel();
         checkUser();
-        SharedPreferences preferences1 = getSharedPreferences("Number",MODE_PRIVATE);
+        SharedPreferences preferences1 = getSharedPreferences("Number", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences1.edit();
         String number = "0";
-        editor.putString("number",""+number);
+        editor.putString("number", "" + number);
         editor.apply();
         getBill();
+
+        // Cấu hình AppBar và Navigation
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home,
                 R.id.nav_Product,
@@ -114,34 +115,34 @@ public class MainActivity extends AppCompatActivity{
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(mNavigationView, navController);
-
     }
-    public void loadUserInfoById(String phoneNumber){
-        Log.d(TAG, "loadUserInfoById: ");
+
+    // Tải thông tin người dùng theo số điện thoại
+    public void loadUserInfoById(String phoneNumber) {
         Log.d(TAG, "loadUserInfoById: " + phoneNumber);
         final DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
         rootReference.child("User").child(phoneNumber)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        Log.d(TAG, "onDataChange: ");
                         if (snapshot.exists()) {
                             MainActivity.this.user = snapshot.getValue(User.class);
-                            Log.d(TAG, "onDataChange: " + user);
                             profileViewModel.setUser(user);
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         Log.e(TAG, "onCancelled: ", error.toException());
                     }
                 });
     }
-    //TODO: thử chuyển method sang ProfileFragment
+
+    // Kết quả khi chọn ảnh từ thư viện hoặc chụp ảnh
     private final ActivityResultLauncher<Intent> mActivityResultLauncher =
             registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult()
-                    , new ActivityResultCallback<ActivityResult>() {
+                    new ActivityResultContracts.StartActivityForResult(),
+                    new ActivityResultCallback<ActivityResult>() {
                         @Override
                         public void onActivityResult(ActivityResult result) {
                             if (result.getResultCode() == RESULT_OK) {
@@ -151,58 +152,53 @@ public class MainActivity extends AppCompatActivity{
                                     Bitmap selectedImageBitmap = null;
                                     try {
                                         selectedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriImage);
-                                        Log.d(TAG, "onActivityResult: " + selectedImageBitmap.toString());
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
-                                    Log.d(TAG, "onActivityResult: ");
                                     profileViewModel.setBitmapImageAvatar(selectedImageBitmap);
                                 }
                             }
                         }
                     });
-    public void checkUser(){
-        SharedPreferences sharedPreferences = getSharedPreferences("My_User",MODE_PRIVATE);
-        String username = sharedPreferences.getString("username","");
-        String userRule = sharedPreferences.getString("role","");
+
+    // Kiểm tra loại người dùng và thiết lập giao diện tương ứng
+    public void checkUser() {
+        SharedPreferences sharedPreferences = getSharedPreferences("My_User", MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "");
+        String userRule = sharedPreferences.getString("role", "");
         String userId = sharedPreferences.getString("id", "");
 
-        if (userRule.equals("admin")){
-            Log.d(TAG, "checkUser: admin");
+        if (userRule.equals("admin")) {
             mNavigationView.setVisibility(View.VISIBLE);
             mNavigationView.getMenu().findItem(R.id.nav_Food).setVisible(false);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         } else if (userRule.equals("partner")) {
-            Log.d(TAG, "checkUser: partner");
             loadPartnerInfoById(userId);
             try {
                 setPartnerViewModelObserver();
             } catch (Exception e) {
                 Log.e(TAG, "checkUser: ", e);
             }
-
         } else if (userRule.equals("user")) {
             loadUserInfoById(username);
             setUserViewModelObserver();
             mNavigationView.setVisibility(View.GONE);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            Log.d(TAG, "checkUser: user");
         } else {
             mNavigationView.setVisibility(View.GONE);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
-
     }
 
+    // Thiết lập observer cho PartnerViewModel
     private void setPartnerViewModelObserver() throws Exception {
         final Observer<Partner> partnerObserver = new Observer<Partner>() {
             @Override
             public void onChanged(Partner partner) {
-                Log.d(TAG, "onChanged: change user information");
                 tvUserEmail.setText(partner.getUserPartner());
                 tvUserName.setText(partner.getNamePartner());
-                SharedPreferences sharedPreferences = getSharedPreferences("My_User",MODE_PRIVATE);
-                String password = sharedPreferences.getString("password","");
+                SharedPreferences sharedPreferences = getSharedPreferences("My_User", MODE_PRIVATE);
+                String password = sharedPreferences.getString("password", "");
                 if (!partner.getPasswordPartner().equals(password)) {
                     sharedPreferences.edit().putString("password", partner.getPasswordPartner()).commit();
                 }
@@ -212,17 +208,14 @@ public class MainActivity extends AppCompatActivity{
                         .error(R.drawable.ic_avatar_default)
                         .signature(new ObjectKey(Long.toString(System.currentTimeMillis())))
                         .into(ivAvatar);
-                Log.d(TAG, "onChanged: " + partner.toString());
             }
-
         };
         profileViewModel.getPartner().observe(this, partnerObserver);
     }
 
+    // Tải thông tin partner theo ID
     private void loadPartnerInfoById(String id) {
         partner = new Partner();
-        Log.d(TAG, "loadPartnerInfoById: " + id);
-        Log.d(TAG, "loadPartnerById: " + partner.toString());
         final DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
         rootReference.child("Partner").child(id)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -230,17 +223,15 @@ public class MainActivity extends AppCompatActivity{
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             MainActivity.this.partner = snapshot.getValue(Partner.class);
-                            Log.d(TAG, "onDataChange: " + partner);
                             try {
                                 showPartnerInformation();
-                            } catch ( Exception e) {
+                            } catch (Exception e) {
                                 Log.e(TAG, "onDataChange: ", e);
                             }
                         }
-
                     }
 
-                    private void showPartnerInformation() throws Exception{
+                    private void showPartnerInformation() throws Exception {
                         profileViewModel.setPartner(partner);
                         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                         mNavigationView.setVisibility(View.VISIBLE);
@@ -255,23 +246,15 @@ public class MainActivity extends AppCompatActivity{
                 });
     }
 
-//    @Deprecated
-//    private void initReferent() {
-//        user = new User();
-//        userAuth = FirebaseAuth.getInstance().getCurrentUser();
-//        mDatabase = FirebaseDatabase.getInstance().getReference();
-//    }
-
-    @Deprecated
+    // Thiết lập observer cho UserViewModel
     private void setUserViewModelObserver() {
         final Observer<User> userObserver = new Observer<User>() {
             @Override
             public void onChanged(User user1) {
-                Log.d(TAG, "onChanged: change user information");
                 tvUserEmail.setText(user1.getPhoneNumber());
                 tvUserName.setText(user1.getName());
-                SharedPreferences sharedPreferences = getSharedPreferences("My_User",MODE_PRIVATE);
-                String password = sharedPreferences.getString("password","");
+                SharedPreferences sharedPreferences = getSharedPreferences("My_User", MODE_PRIVATE);
+                String password = sharedPreferences.getString("password", "");
                 if (!user1.getPassword().equals(password)) {
                     sharedPreferences.edit().putString("password", user1.getPassword()).commit();
                 }
@@ -280,18 +263,17 @@ public class MainActivity extends AppCompatActivity{
                         .error(R.drawable.ic_avatar_default)
                         .signature(new ObjectKey(Long.toString(System.currentTimeMillis())))
                         .into(ivAvatar);
-                Log.d(TAG, "onChanged: " + user1.toString());
             }
-
         };
         profileViewModel.getUser().observe(this, userObserver);
     }
 
+    // Khởi tạo ViewModel
     private void initViewModel() {
         this.profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-
     }
 
+    // Khởi tạo các thành phần UI
     private void initUI() {
         mDrawerLayout = binding.drawerLayout;
         mNavigationView = binding.navView;
@@ -468,10 +450,10 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    public  void notification(){
-        String CHANNEL_ID="1234";
-
-        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ getPackageName() + "/" + R.raw.sound);
+    // Gửi thông báo khi có hóa đơn mới
+    public void notification() {
+        String CHANNEL_ID = "1234";
+        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getPackageName() + "/" + R.raw.sound);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         NotificationChannel mChannel;
@@ -485,26 +467,24 @@ public class MainActivity extends AppCompatActivity{
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
             mChannel.setSound(soundUri, audioAttributes);
-            mChannel.setVibrationPattern( new long []{ 100 , 200 , 300 , 400 , 500 , 400 , 300 , 200 , 400 }) ;
+            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
             if (mNotificationManager != null) {
-                mNotificationManager.createNotificationChannel( mChannel );
+                mNotificationManager.createNotificationChannel(mChannel);
             }
         }
 
-        NotificationCompat.Builder status = new NotificationCompat.Builder(this,CHANNEL_ID);
+        NotificationCompat.Builder status = new NotificationCompat.Builder(this, CHANNEL_ID);
         status.setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("Bạn có đơn hàng mới")
-                .setDefaults(Notification.DEFAULT_LIGHTS )
-                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +getPackageName()+"/"+R.raw.sound))
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setSound(soundUri)
                 .build();
 
-
-        mNotificationManager.notify((int)System.currentTimeMillis(), status.build());
-
+        mNotificationManager.notify((int) System.currentTimeMillis(), status.build());
     }
 
     @Override
@@ -519,9 +499,4 @@ public class MainActivity extends AppCompatActivity{
         unregisterReceiver(connectionReceiver);
         super.onStop();
     }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
 }

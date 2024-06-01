@@ -1,6 +1,5 @@
 package com.example.greenfoodsapp.Activity;
 
-
 import static com.example.greenfoodsapp.constant.Profile.FIELDS_EMPTY;
 import static com.example.greenfoodsapp.constant.Profile.NUMBER_PHONE_INVALID;
 import static com.example.greenfoodsapp.constant.Profile.PASSWORD_INVALID;
@@ -35,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Map;
 import java.util.Objects;
 
+// Ông Vũ Hữu Tài - 21110796
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = "SignUpActivity";
     private TextInputLayout mFormPhoneNumber,
@@ -52,6 +52,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().hide(); // Ẩn actionbar
     }
 
+    // Khởi tạo giao diện người dùng
     private void initUI() {
         mFormPhoneNumber = findViewById(R.id.form_SignUpActivity_phone_number);
         mFormUserName = findViewById(R.id.form_SignUpActivity_user_name);
@@ -62,10 +63,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         setOnclickListener();
     }
 
+    // Thiết lập các sự kiện khi nhấn vào các nút
     private void setOnclickListener() {
         mBtnSignUp.setOnClickListener(this::onClick);
     }
 
+    // Xử lý sự kiện nhấn vào các nút
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -75,6 +78,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    // Xử lý đăng ký tài khoản
     private void signUp() {
         final DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
         mFormPhoneNumber.setError(null);
@@ -88,6 +92,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String strConfirmPassword = mFormConfirmPassword.getEditText().getText().toString().trim();
         String strAddress = mFormAddress.getEditText().getText().toString().trim();
         try {
+            // Kiểm tra tính hợp lệ của dữ liệu
             validate(strPhoneNumber,
                     strUserName,
                     strPassword,
@@ -106,6 +111,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (!snapshot.exists()) {
+                        // Thêm người dùng mới vào cơ sở dữ liệu
                         Map<String, Object> userDataMap = user.toMap();
                         rootReference.child("User")
                                 .child(strPhoneNumber)
@@ -118,8 +124,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                                         , "Tạo tài khoản thành công"
                                                         , Toast.LENGTH_SHORT)
                                                 .show();
-                                        remember(strPhoneNumber,strPassword,"user",strPhoneNumber);
-                                        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                                        remember(strPhoneNumber, strPassword, "user", strPhoneNumber);
+                                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
                                         finishAffinity();
                                     }
                                 })
@@ -134,7 +140,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                     }
                                 });
                     } else {
-                        //TODO thông báo số điện thoại đã tồn tại tới view
+                        // Thông báo số điện thoại đã tồn tại
                         progressDialog.dismiss();
                         mFormPhoneNumber.setError("Số điện thoại đã tồn tại");
                     }
@@ -146,13 +152,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                     , "Có lỗi khi tạo tài khoản, vui lòng thử lại sau"
                                     , Toast.LENGTH_LONG)
                             .show();
-                    Log.e(TAG, "onCancelled: ",error.toException() );
+                    Log.e(TAG, "onCancelled: ", error.toException());
                 }
             });
         } catch (NullPointerException e) {
             if (e.getMessage().equals(FIELDS_EMPTY)) {
                 setErrorEmpty();
-                //TODO thông báo lỗi khi empty
             } else {
                 Log.e(TAG, "signUp: ", e);
             }
@@ -167,90 +172,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 Log.e(TAG, "signUp: ", e);
             }
         } catch (Exception e) {
-            //TODO ngoại lệ gì đó chưa bắt được
             Log.e(TAG, "signUp: ", e);
         }
-
-        /*try {
-            validate(strPhoneNumber,
-                    strUserName,
-                    strPassword,
-                    strConfirmPassword,
-                    strAddress);
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            mProgressDialog.show();
-            auth.createUserWithEmailAndPassword(strPhoneNumber, strPassword)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            mProgressDialog.dismiss();
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d(TAG, "createUserWithEmail:success");
-                                FirebaseUser userAuth = auth.getCurrentUser();
-                                User user = new User();
-                                user.setEmail(mEtPhoneNumber.getText().toString());
-                                user.setPassword(mEtPassword.getText().toString());
-                                user.setId(userAuth.getUid());
-                                writeNewUser(user);
-                                Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
-                                //
-                                startActivity(intent);
-                                finishAffinity();
-//                            updateUI(user);
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(SignUpActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
-                            }
-                        }
-
-                        private void writeNewUser(User user) {
-                            DatabaseReference databaseReference;
-                            databaseReference = FirebaseDatabase.getInstance().getReference();
-                            databaseReference
-                                    .child("users")
-                                    .child(user.getId())
-                                    .child("id")
-                                    .setValue(user.getId());
-                            databaseReference
-                                    .child("users")
-                                    .child(user.getId())
-                                    .child("email")
-                                    .setValue(user.getEmail());
-                            databaseReference
-                                    .child("users")
-                                    .child(user.getId())
-                                    .child("role")
-                                    .setValue("customer");
-                        }
-                    });
-
-        } catch (NullPointerException e) {
-            if (e.getMessage().equals(FIELDS_EMPTY)) {
-                //TODO thông báo lỗi khi empty
-            } else {
-                Log.e(TAG, "signUp: ", e);
-            }
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().equals(NUMBER_PHONE_INVALID)) {
-                //TODO thông báo lỗi khi số điện thoại không đúng định dạng
-            } else if (e.getMessage().equals(PASSWORD_INVALID)) {
-                //TODO thông báo lỗi khi mật khẩu không hợp lệ
-            } else if (e.getMessage().equals(PASSWORD_NOT_MATCH)) {
-                //TODO thông báo lỗi số điện thoại không trùng nhau
-            } else {
-                Log.e(TAG, "signUp: ", e);
-            }
-        } catch (Exception e) {
-            //TODO ngoại lệ gì đó chưa bắt được
-            Log.e(TAG, "signUp: ", e);
-        }*/
-
     }
 
+    // Thiết lập lỗi nếu các trường dữ liệu trống
     private void setErrorEmpty() {
         if (mFormPhoneNumber.getEditText().getText().toString().isEmpty()) {
             mFormPhoneNumber.setError("Số điện thoại không được để trống");
@@ -267,9 +193,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         if (mFormAddress.getEditText().getText().toString().isEmpty()) {
             mFormAddress.setError("Địa chỉ không được để trống");
         }
-
     }
 
+    // Kiểm tra tính hợp lệ của dữ liệu
     private void validate(String strPhoneNumber,
                           String strUserName,
                           String strPassword,
@@ -282,20 +208,22 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 || strAddress.isEmpty())
             throw new NullPointerException(FIELDS_EMPTY);
         if (!strPhoneNumber.matches(REGEX_PHONE_NUMBER))
-            throw  new IllegalArgumentException(NUMBER_PHONE_INVALID);
+            throw new IllegalArgumentException(NUMBER_PHONE_INVALID);
         if (strPassword.length() < 6)
-            throw  new IllegalArgumentException(PASSWORD_INVALID);
+            throw new IllegalArgumentException(PASSWORD_INVALID);
         if (!strConfirmPassword.equals(strPassword))
             throw new IllegalArgumentException(PASSWORD_NOT_MATCH);
     }
-    public void remember(String user,String password,String role, String id){
-        SharedPreferences sharedPreferences = getSharedPreferences("My_User",MODE_PRIVATE);
+
+    // Lưu thông tin đăng nhập vào SharedPreferences
+    public void remember(String user, String password, String role, String id) {
+        SharedPreferences sharedPreferences = getSharedPreferences("My_User", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("username", user);
         editor.putString("password", password);
         editor.putString("role", role);
         editor.putString("id", id);
-        editor.putBoolean("logged",true);
+        editor.putBoolean("logged", true);
         editor.putBoolean("remember", true);
         editor.apply();
     }

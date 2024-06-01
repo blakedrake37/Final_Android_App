@@ -6,6 +6,7 @@ import android.net.Uri;
 import java.util.HashMap;
 import java.util.Map;
 
+// Ông Vũ Hữu Tài - 21110796
 public class User {
 
     private String strUriAvatar;

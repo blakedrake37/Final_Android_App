@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-
+// Lê Nguyễn Toàn Tâm - 21110797
 public class FoodFragment extends Fragment {
     private List<Product> listFood;
     private RecyclerView rvFood;
@@ -62,28 +62,30 @@ public class FoodFragment extends Fragment {
     private Partner partner = new Partner();
     private FloatingActionButton fab_addProduct;
     private List<Product> listProduct;
-    private TextInputLayout til_nameProduct,til_priceProduct;
-    private ImageView img_Product,img_addImageCamera,img_addImageDevice;
-    private String nameProduct,imgProduct,userPartner,priceProduct;
+    private TextInputLayout til_nameProduct, til_priceProduct;
+    private ImageView img_Product, img_addImageCamera, img_addImageDevice;
+    private String nameProduct, imgProduct, userPartner, priceProduct;
     private int codeCategory;
-    private Button btn_addVegetable,btn_cancleVegetable;
-    private static final int REQUEST_ID_IMAGE_CAPTURE =10;
-    private static final int PICK_IMAGE =100;
+    private Button btn_addVegetable, btn_cancleVegetable;
+    private static final int REQUEST_ID_IMAGE_CAPTURE = 10;
+    private static final int PICK_IMAGE = 100;
     private ProductFragment fragment = new ProductFragment();
     private TextView tvErrorImg;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Khởi tạo view và các UI components
         view = inflater.inflate(R.layout.fragment_food, container, false);
         initUI();
         rvFood.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
+        // Lấy thông tin user từ SharedPreferences
         sharedPreferences = getContext().getSharedPreferences("My_User", Context.MODE_PRIVATE);
-        user = sharedPreferences.getString("username","");
-        if(user.equals("admin")){
-           view.findViewById(R.id.fab_addFood_fragment).setVisibility(View.GONE);
-        }else {
+        user = sharedPreferences.getString("username", "");
+        if (user.equals("admin")) {
+            view.findViewById(R.id.fab_addFood_fragment).setVisibility(View.GONE);
+        } else {
             view.findViewById(R.id.fab_addFood_fragment).setVisibility(View.VISIBLE);
         }
         fab_addProduct = view.findViewById(R.id.fab_addFood_fragment);
@@ -92,17 +94,21 @@ public class FoodFragment extends Fragment {
         });
 
         return view;
-    }public void initUI(){
+    }
+
+    // Khởi tạo UI
+    public void initUI() {
         listProduct = getAllProduct();
         listFood = getProductPartner();
         rvFood = view.findViewById(R.id.rvFood);
         linearLayoutManager = new LinearLayoutManager(getContext());
         rvFood.setLayoutManager(linearLayoutManager);
-        adapter = new ProductAdapter(listFood,fragment,getContext());
+        adapter = new ProductAdapter(listFood, fragment, getContext());
         rvFood.setAdapter(adapter);
-
     }
-    public  List<Product> getAllProduct(){
+
+    // Lấy tất cả sản phẩm từ Firebase
+    public List<Product> getAllProduct() {
         ProgressDialog progressDialog = new ProgressDialog(requireContext());
         progressDialog.setMessage("Vui lòng đợi ...");
         progressDialog.setCanceledOnTouchOutside(false);
@@ -115,11 +121,12 @@ public class FoodFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 progressDialog.dismiss();
                 list1.clear();
-                for(DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Product product = snap.getValue(Product.class);
                     list1.add(product);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -127,7 +134,9 @@ public class FoodFragment extends Fragment {
         });
         return list1;
     }
-    public  List<Product> getProductPartner(){
+
+    // Lấy sản phẩm của đối tác hiện tại từ Firebase
+    public List<Product> getProductPartner() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Product");
         List<Product> list1 = new ArrayList<>();
@@ -135,11 +144,11 @@ public class FoodFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list1.clear();
-                for(DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Product product = snap.getValue(Product.class);
-                    if (user.equals("admin") && product.getCodeCategory()==4){
+                    if (user.equals("admin") && product.getCodeCategory() == 4) {
                         list1.add(product);
-                    }else if (product.getUserPartner().equals(user) && product.getCodeCategory()==4 ){
+                    } else if (product.getUserPartner().equals(user) && product.getCodeCategory() == 4) {
                         list1.add(product);
                     }
                 }
@@ -154,10 +163,11 @@ public class FoodFragment extends Fragment {
         return list1;
     }
 
+    // Hiển thị dialog thêm sản phẩm mới
     private void dialogProduct() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Thêm sản phẩm");
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_product,null);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_product, null);
         builder.setView(view);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -172,23 +182,26 @@ public class FoodFragment extends Fragment {
         btn_addVegetable.setOnClickListener(view1 -> {
             getData();
             validate();
-
         });
         btn_cancleVegetable.setOnClickListener(view1 -> {
             alertDialog.dismiss();
         });
     }
-    public void initUiDialog(View view){
+
+    // Khởi tạo các thành phần UI trong dialog
+    public void initUiDialog(View view) {
         tvErrorImg = view.findViewById(R.id.error_img);
         img_Product = view.findViewById(R.id.imgProduct_dialog);
         img_addImageCamera = view.findViewById(R.id.img_addImageCamera_dialog);
         img_addImageDevice = view.findViewById(R.id.img_addImageDevice_dialog);
-        til_nameProduct =  view.findViewById(R.id.til_NameProduct_dialog);
-        til_priceProduct =  view.findViewById(R.id.til_PriceProduct_dialog);
-        btn_addVegetable =  view.findViewById(R.id.btn_addVegetable_dialog);
-        btn_cancleVegetable =  view.findViewById(R.id.btn_cancleVegetable_dialog);
+        til_nameProduct = view.findViewById(R.id.til_NameProduct_dialog);
+        til_priceProduct = view.findViewById(R.id.til_PriceProduct_dialog);
+        btn_addVegetable = view.findViewById(R.id.btn_addVegetable_dialog);
+        btn_cancleVegetable = view.findViewById(R.id.btn_cancleVegetable_dialog);
     }
-    public void requestPermissionCamera(){
+
+    // Yêu cầu quyền truy cập camera
+    public void requestPermissionCamera() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -202,11 +215,13 @@ public class FoodFragment extends Fragment {
         };
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn không cấp quyền,bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
+                .setDeniedMessage("Nếu bạn không cấp quyền, bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
                 .setPermissions(Manifest.permission.CAMERA)
                 .check();
     }
-    public void requestPermissionDevice(){
+
+    // Yêu cầu quyền truy cập bộ nhớ thiết bị
+    public void requestPermissionDevice() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -220,19 +235,22 @@ public class FoodFragment extends Fragment {
         };
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn không cấp quyền,bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng" )
+                .setDeniedMessage("Nếu bạn không cấp quyền, bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
                 .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }
+
+    // Mở ứng dụng camera
     private void captureImage() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         this.startActivityForResult(intent, REQUEST_ID_IMAGE_CAPTURE);
     }
+
+    // Mở thư viện ảnh trên thiết bị
     private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -246,71 +264,78 @@ public class FoodFragment extends Fragment {
                 img_Product.setImageURI(imageUri);
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(getContext(), "Bạn chưa thêm ảnh", Toast.LENGTH_LONG).show();
-            } else if (data!=null){
+            } else if (data != null) {
                 Toast.makeText(getContext(), "Lỗi", Toast.LENGTH_LONG).show();
-
             }
         }
         if (requestCode == PICK_IMAGE) {
-            if (resultCode == RESULT_OK ) {
+            if (resultCode == RESULT_OK) {
                 Uri imageUri = data.getData();
                 this.img_Product.setImageURI(imageUri);
             }
         }
-
     }
-    public void getData(){
+
+    // Lấy dữ liệu sản phẩm từ dialog
+    public void getData() {
         nameProduct = til_nameProduct.getEditText().getText().toString();
         try {
-            Bitmap bitmap = ((BitmapDrawable)img_Product.getDrawable()).getBitmap();
+            Bitmap bitmap = ((BitmapDrawable) img_Product.getDrawable()).getBitmap();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] imgByte = outputStream.toByteArray();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 imgProduct = Base64.getEncoder().encodeToString(imgByte);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("My_User", Context.MODE_PRIVATE);
-        userPartner = sharedPreferences.getString("username","");
+        userPartner = sharedPreferences.getString("username", "");
         codeCategory = 4;
         priceProduct = til_priceProduct.getEditText().getText().toString();
-
     }
-    public boolean isEmptys(String str,TextInputLayout til){
-        if (str.isEmpty()){
+
+    // Kiểm tra trường dữ liệu rỗng
+    public boolean isEmptys(String str, TextInputLayout til) {
+        if (str.isEmpty()) {
             til.setError("Không được để trống");
             return false;
-        }else{
+        } else {
             til.setError("");
             return true;
         }
-
     }
-    public boolean errorImg(String str, TextView tv){
-        if (str != null){
+
+    // Kiểm tra ảnh sản phẩm rỗng
+    public boolean errorImg(String str, TextView tv) {
+        if (str != null) {
             tv.setText("");
             return true;
-        }else {
+        } else {
             tv.setText("Ảnh không được để trống");
             return false;
         }
     }
-    public void validate(){
+
+    // Kiểm tra và xác thực dữ liệu đầu vào
+    public void validate() {
         if (isEmptys(nameProduct, til_nameProduct) && isEmptys(priceProduct, til_priceProduct) && errorImg(imgProduct, tvErrorImg)) {
             setDataProduct();
             removeAll();
         }
     }
-    public void removeAll(){
+
+    // Xóa dữ liệu trong dialog sau khi thêm sản phẩm thành công
+    public void removeAll() {
         til_nameProduct.getEditText().setText("");
         til_priceProduct.getEditText().setText("");
         img_Product.setImageResource(R.drawable.ic_baseline_image_24);
     }
-    public void setDataProduct(){
+
+    // Thiết lập dữ liệu sản phẩm
+    public void setDataProduct() {
         Product product = new Product();
         product.setUserPartner(userPartner);
         product.setCodeCategory(codeCategory);
@@ -318,21 +343,20 @@ public class FoodFragment extends Fragment {
         product.setPriceProduct(Integer.parseInt(priceProduct));
         product.setImgProduct(imgProduct);
         addProduct(product);
-
     }
-    public void addProduct(Product product){
+
+    // Thêm sản phẩm vào Firebase
+    public void addProduct(Product product) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Product");
-        if (listProduct.size()==0){
+        if (listProduct.size() == 0) {
             product.setCodeProduct(1);
             reference.child("1").setValue(product);
-
-        }else {
-            int i = listProduct.size()-1;
-            int id = listProduct.get(i).getCodeProduct()+1;
+        } else {
+            int i = listProduct.size() - 1;
+            int id = listProduct.get(i).getCodeProduct() + 1;
             product.setCodeProduct(id);
-
-            reference.child(""+id).setValue(product);
+            reference.child("" + id).setValue(product);
         }
     }
 }

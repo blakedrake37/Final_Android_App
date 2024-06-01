@@ -1,5 +1,7 @@
 package com.example.greenfoodsapp.Model;
 
+
+// Nguyễn Đức Huy - 20145449
 public class Bill {
     private int idBill,total;
     private String dayOut,status,idClient,timeOut,idPartner;

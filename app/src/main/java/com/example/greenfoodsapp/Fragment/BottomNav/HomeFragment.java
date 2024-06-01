@@ -16,23 +16,28 @@ import com.example.greenfoodsapp.R;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+// Ông Vũ Hữu Tài - 21110796
 public class HomeFragment extends Fragment {
 
-    FrameLayout frame_Home;
-    BottomNavigationView bottom_nav_Home;
+    private FrameLayout frame_Home;
+    private BottomNavigationView bottom_nav_Home;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view= inflater.inflate(R.layout.fragment_home, container, false);
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        // Khởi tạo các thành phần giao diện
         frame_Home = view.findViewById(R.id.frame_Home);
         bottom_nav_Home = view.findViewById(R.id.bottom_nav_Home);
 
+        // Thiết lập fragment mặc định là HomePageFragment
         replaceFragment(new HomePageFragment());
 
+        // Thiết lập sự kiện cho BottomNavigationView
         bottom_nav_Home.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.action_home:
                     replaceFragment(new HomePageFragment());
                     break;
@@ -46,18 +51,16 @@ public class HomeFragment extends Fragment {
                     replaceFragment(new PersonalFragment());
                     break;
             }
-
             return true;
         });
-        return  view;
-
+        return view;
     }
 
-    private  void replaceFragment(Fragment fragment){
+    // Hàm thay thế fragment hiện tại bằng fragment mới
+    private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_Home,fragment);
+        fragmentTransaction.replace(R.id.frame_Home, fragment);
         fragmentTransaction.commit();
     }
-
 }

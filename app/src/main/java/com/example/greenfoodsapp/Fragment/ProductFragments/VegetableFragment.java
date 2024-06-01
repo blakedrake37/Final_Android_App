@@ -1,6 +1,5 @@
 package com.example.greenfoodsapp.Fragment.ProductFragments;
 
-
 import android.app.ProgressDialog;
 import android.os.Bundle;
 
@@ -10,13 +9,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.greenfoodsapp.Adapter.ProductAdapter;
-
 import com.example.greenfoodsapp.Model.Product;
 import com.example.greenfoodsapp.R;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
+// Lê Nguyễn Toàn Tâm - 21110797
 public class VegetableFragment extends Fragment {
 
     private List<Product> listVegetable;
@@ -36,26 +33,29 @@ public class VegetableFragment extends Fragment {
     private LinearLayoutManager linearLayoutManager;
     private ProductAdapter adapter;
     private View view;
-    private ProductFragment fragment= new ProductFragment();
+    private ProductFragment fragment = new ProductFragment();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-         view = inflater.inflate(R.layout.fragment_vegetable, container, false);
-         unitUI();
+        view = inflater.inflate(R.layout.fragment_vegetable, container, false);
+        unitUI();
         return view;
     }
-    public void unitUI(){
+
+    // Khởi tạo các thành phần UI
+    public void unitUI() {
         listVegetable = getVegetableProduct();
         rvVegetable = view.findViewById(R.id.rvVegetable);
         linearLayoutManager = new LinearLayoutManager(getContext());
         rvVegetable.setLayoutManager(linearLayoutManager);
-        adapter = new ProductAdapter(listVegetable,fragment,getContext());
+        adapter = new ProductAdapter(listVegetable, fragment, getContext());
         rvVegetable.setAdapter(adapter);
         rvVegetable.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }
 
-    public  List<Product> getVegetableProduct(){
+    // Lấy danh sách sản phẩm rau củ từ Firebase
+    public List<Product> getVegetableProduct() {
         ProgressDialog progressDialog = new ProgressDialog(requireContext());
         progressDialog.setMessage("Vui lòng đợi ...");
         progressDialog.setCanceledOnTouchOutside(false);
@@ -68,9 +68,9 @@ public class VegetableFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 progressDialog.dismiss();
                 list1.clear();
-                for(DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Product product = snap.getValue(Product.class);
-                    if (product.getCodeCategory()==1){
+                    if (product != null && product.getCodeCategory() == 1) {
                         list1.add(product);
                     }
                 }
@@ -79,11 +79,9 @@ public class VegetableFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Xử lý lỗi khi truy xuất dữ liệu thất bại
             }
         });
         return list1;
     }
-
-
 }

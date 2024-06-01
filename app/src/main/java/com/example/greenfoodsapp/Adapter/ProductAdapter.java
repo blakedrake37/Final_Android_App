@@ -38,27 +38,27 @@ import android.util.Base64;
 import android.widget.Toast;
 
 import java.util.List;
-
+// Lê Nguyễn Toàn Tâm - 21110797
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHolder> {
     private List<Product> list;
     private List<Cart> listCart;
     private ProductFragment fragment;
     private Context context;
-
+    // Constructor nhận danh sách sản phẩm, fragment và context
     public ProductAdapter(List<Product> list, ProductFragment fragment, Context context) {
         this.list = list;
         this.fragment = fragment;
         this.context = context;
         notifyDataSetChanged();
     }
-
+    // Tạo viewHolder để hiển thị một mục (item) của danh sách sản phẩm
     @NonNull
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product,parent,false);
         return new viewHolder(view);
     }
-
+    // Gắn dữ liệu vào viewHolder
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
@@ -85,13 +85,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHold
                     }
                 }
             });
+            // Thiết lập hành vi khi nhấn nút cập nhật
             holder.btnUpdateProduct.setOnClickListener(view -> {
                 fragment.dialogProduct(product, 1, context);
             });
+            // Thiết lập hành vi khi nhấn nút xóa
             holder.btnDeleteProduct.setOnClickListener(view -> {
                 showDialogDelete(product);
             });
 
+            // Thiết lập hành vi khi nhấn nút thêm vào giỏ hàng
             holder.btn_addCart.setOnClickListener(view -> {
                 if (!user.equals("")) {
                 StringBuilder str = new StringBuilder();
@@ -143,14 +146,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHold
 
 
     }
-
+    // Hàm xóa giỏ hàng khỏi cơ sở dữ liệu Firebase
     private void deleteCart(Cart cart) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Cart");
         reference.child(""+cart.getIdCart()).removeValue();
     }
 
-
+    // Trả về số lượng sản phẩm trong danh sách
     @Override
     public int getItemCount() {
         if (list!=null){
@@ -158,7 +161,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHold
         }
         return 0;
     }
-
+    // viewHolder chứa các view của item sản phẩm
     public class viewHolder extends RecyclerView.ViewHolder{
 
         private TextView tvNameProduct,tvPriceProduct;
@@ -179,7 +182,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHold
         }
 
         }
-
+    // Hàm thêm sản phẩm vào giỏ hàng
     public void addProductCart(Cart cart){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Cart");
@@ -197,6 +200,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHold
         }
 
     }
+    // Hàm lấy tất cả giỏ hàng từ cơ sở dữ liệu Firebase
     public  List<Cart> getAllCart(){
         SharedPreferences preferences = context.getSharedPreferences("My_User",context.MODE_PRIVATE);
         String user = preferences.getString("username","");
@@ -226,6 +230,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHold
         });
         return list1;
     }
+    // Hiển thị hộp thoại xác nhận xóa sản phẩm
     private void showDialogDelete(Product product) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("Bạn có chắc muốn xóa sản phẩm");
@@ -244,7 +249,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.viewHold
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
+    // Hiển thị hộp thoại yêu cầu đăng nhập
     public void showDialogLogin() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("Bạn phải đăng nhập");

@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-
+// Lê Nguyễn Toàn Tâm - 21110797
 public class PartnerFragment extends Fragment {
     private static final int REQUEST_ID_IMAGE_CAPTURE = 1;
     private static final int PICK_IMAGE = 2;
@@ -55,164 +55,189 @@ public class PartnerFragment extends Fragment {
     private List<User> listUser;
     private PartnerAdapter adapter;
     private TextView tvErrorImg;
-    private TextInputLayout til_namePartner,til_addressPartner,til_UserPartner,til_PasswordPartner,til_rePasswordPartner;
-    private Button btnAddPartner,btnCancelPartner;
-    private String namePartner,addressPartner,userPartner,passwordPartner,rePasswordPartner,imgPartner;
+    private TextInputLayout til_namePartner, til_addressPartner, til_UserPartner, til_PasswordPartner, til_rePasswordPartner;
+    private Button btnAddPartner, btnCancelPartner;
+    private String namePartner, addressPartner, userPartner, passwordPartner, rePasswordPartner, imgPartner;
     private FloatingActionButton btn_addPartner;
-    private ImageView img_Partner,imgCamera,imgDevice;
+    private ImageView img_Partner, imgCamera, imgDevice;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_partner, container, false);
         rvPartner = view.findViewById(R.id.rvDoiTac_fragment);
-        listPartner =  getAllPartner();
-        listUser=getAllUser();
-        linearLayoutManager=new LinearLayoutManager(getContext());
+        listPartner = getAllPartner(); // Lấy danh sách tất cả đối tác
+        listUser = getAllUser(); // Lấy danh sách tất cả người dùng
+        linearLayoutManager = new LinearLayoutManager(getContext());
         rvPartner.setLayoutManager(linearLayoutManager);
-        adapter = new PartnerAdapter(listPartner,this);
+        adapter = new PartnerAdapter(listPartner, this);
         rvPartner.setAdapter(adapter);
         btn_addPartner = view.findViewById(R.id.btn_AddPartner_fragment);
         btn_addPartner.setOnClickListener(view1 -> {
-            openDialog();
+            openDialog(); // Mở dialog thêm đối tác
         });
         return view;
-
     }
-    public void openDialog(){
+
+    // Mở dialog thêm đối tác
+    public void openDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Thêm đối tác");
-        View view1 = getLayoutInflater().inflate(R.layout.dialog_partner,null);
+        View view1 = getLayoutInflater().inflate(R.layout.dialog_partner, null);
         builder.setView(view1);
         AlertDialog dialog = builder.create();
         dialog.show();
-        unitUi(view1);
+        unitUi(view1); // Khởi tạo các thành phần giao diện trong dialog
         imgCamera.setOnClickListener(view -> {
-            requestPermissionCamera();
+            requestPermissionCamera(); // Yêu cầu quyền truy cập camera
         });
         imgDevice.setOnClickListener(view -> {
-            requestPermissionDevice();
+            requestPermissionDevice(); // Yêu cầu quyền truy cập thư viện ảnh
         });
         btnAddPartner.setOnClickListener(view -> {
-            getData();
-            validate();
+            getData(); // Lấy dữ liệu từ các trường nhập liệu
+            validate(); // Kiểm tra tính hợp lệ của dữ liệu
         });
         btnCancelPartner.setOnClickListener(view -> {
-            dialog.dismiss();
+            dialog.dismiss(); // Đóng dialog
         });
     }
-    public boolean isEmptys(String str,TextInputLayout til){
-        if (str.isEmpty()){
+
+    // Kiểm tra tính hợp lệ của các trường nhập liệu
+    public boolean isEmptys(String str, TextInputLayout til) {
+        if (str.isEmpty()) {
             til.setError("Không được để trống");
             return false;
-        }else {
+        } else {
             til.setError("");
             return true;
         }
     }
-    public boolean checkLengthNumberPhone(){
-        if(userPartner.length()!=10){
+
+    // Kiểm tra độ dài của số điện thoại
+    public boolean checkLengthNumberPhone() {
+        if (userPartner.length() != 10) {
             til_UserPartner.setError("Số điện thoại phải đủ 10 số.");
             return false;
-        }else {
+        } else {
             til_UserPartner.setError("");
             return true;
         }
     }
-    public boolean checkNumberPhone(){
+
+    // Kiểm tra xem số điện thoại có được sử dụng chưa
+    public boolean checkNumberPhone() {
         for (int i = 0; i < listPartner.size(); i++) {
-            if (listPartner.get(i).getUserPartner().equals(userPartner)){
+            if (listPartner.get(i).getUserPartner().equals(userPartner)) {
                 til_UserPartner.setError("Số điện thoại đã được sử dụng");
                 return false;
-            }else til_UserPartner.setError("");
+            } else {
+                til_UserPartner.setError("");
+            }
         }
         for (int i = 0; i < listUser.size(); i++) {
-            if (listUser.get(i).getPhoneNumber().equals(userPartner)){
+            if (listUser.get(i).getPhoneNumber().equals(userPartner)) {
                 til_UserPartner.setError("Số điện thoại đã được sử dụng");
                 return false;
-            }else til_UserPartner.setError("");
+            } else {
+                til_UserPartner.setError("");
+            }
         }
         return true;
     }
-    public boolean checkPass(){
-        if (!passwordPartner.equals(rePasswordPartner)){
-            til_PasswordPartner.setError("Pass nhập không khớp");
-            til_rePasswordPartner.setError("Pass nhập không khớp");
+
+    // Kiểm tra tính hợp lệ của mật khẩu
+    public boolean checkPass() {
+        if (!passwordPartner.equals(rePasswordPartner)) {
+            til_PasswordPartner.setError("Mật khẩu nhập không khớp");
+            til_rePasswordPartner.setError("Mật khẩu nhập không khớp");
             return false;
-        }else{
+        } else {
             til_PasswordPartner.setError("");
             til_rePasswordPartner.setError("");
             return true;
         }
     }
-    public boolean errorImg(String str, TextView tv){
-        if (str != null){
+
+    // Kiểm tra ảnh có được chọn chưa
+    public boolean errorImg(String str, TextView tv) {
+        if (str != null) {
             tv.setText("");
             return true;
-        }else {
+        } else {
             tv.setText("Ảnh không được để trống");
             return false;
         }
     }
 
-    public void validate(){
-        if(isEmptys(namePartner,til_namePartner) && isEmptys(addressPartner,til_addressPartner)
-        && isEmptys(userPartner,til_UserPartner) && isEmptys(passwordPartner,til_PasswordPartner)
-                && checkLengthNumberPhone() && checkPass() && checkNumberPhone() && errorImg(imgPartner,tvErrorImg) ){
-            setDataPartner();
-            removeAll();
+    // Xác thực dữ liệu
+    public void validate() {
+        if (isEmptys(namePartner, til_namePartner) && isEmptys(addressPartner, til_addressPartner)
+                && isEmptys(userPartner, til_UserPartner) && isEmptys(passwordPartner, til_PasswordPartner)
+                && checkLengthNumberPhone() && checkPass() && checkNumberPhone() && errorImg(imgPartner, tvErrorImg)) {
+            setDataPartner(); // Thiết lập dữ liệu đối tác
+            removeAll(); // Xóa dữ liệu trong các trường nhập liệu
         }
     }
 
-    public void unitUi(View view){
+    // Khởi tạo các thành phần giao diện trong dialog
+    public void unitUi(View view) {
         tvErrorImg = view.findViewById(R.id.error_img);
         img_Partner = view.findViewById(R.id.imgPartner_dialog);
         imgCamera = view.findViewById(R.id.img_addImageCamera_dialog);
         imgDevice = view.findViewById(R.id.img_addImageDevice_dialog);
         btnAddPartner = view.findViewById(R.id.btn_addPartner_dialog);
         btnCancelPartner = view.findViewById(R.id.btn_cancelPartner_dialog);
-        til_namePartner =view.findViewById(R.id.til_namePartner_dialog);
-        til_addressPartner =view.findViewById(R.id.til_addressPartner_dialog);
-        til_UserPartner =view.findViewById(R.id.til_userPartner_dialog);
-        til_PasswordPartner =view.findViewById(R.id.til_passwordPartner_dialog);
-        til_rePasswordPartner =view.findViewById(R.id.til_rePasswordPartner_dialog);
+        til_namePartner = view.findViewById(R.id.til_namePartner_dialog);
+        til_addressPartner = view.findViewById(R.id.til_addressPartner_dialog);
+        til_UserPartner = view.findViewById(R.id.til_userPartner_dialog);
+        til_PasswordPartner = view.findViewById(R.id.til_passwordPartner_dialog);
+        til_rePasswordPartner = view.findViewById(R.id.til_rePasswordPartner_dialog);
     }
-    public void getData(){
+
+    // Lấy dữ liệu từ các trường nhập liệu
+    public void getData() {
         try {
-            Bitmap bitmap = ((BitmapDrawable)img_Partner.getDrawable()).getBitmap();
+            Bitmap bitmap = ((BitmapDrawable) img_Partner.getDrawable()).getBitmap();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] imgByte = outputStream.toByteArray();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 imgPartner = Base64.getEncoder().encodeToString(imgByte);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         namePartner = til_namePartner.getEditText().getText().toString();
         addressPartner = til_addressPartner.getEditText().getText().toString();
-        userPartner  = til_UserPartner.getEditText().getText().toString();
+        userPartner = til_UserPartner.getEditText().getText().toString();
         passwordPartner = til_PasswordPartner.getEditText().getText().toString();
         rePasswordPartner = til_rePasswordPartner.getEditText().getText().toString();
     }
-    public void setDataPartner(){
+
+    // Thiết lập dữ liệu đối tác
+    public void setDataPartner() {
         Partner partner = new Partner();
         partner.setNamePartner(namePartner);
         partner.setAddressPartner(addressPartner);
         partner.setUserPartner(userPartner);
         partner.setPasswordPartner(passwordPartner);
         partner.setImgPartner(imgPartner);
-        addPartner(partner);
+        addPartner(partner); // Thêm đối tác vào cơ sở dữ liệu
     }
-    public void removeAll(){
+
+    // Xóa dữ liệu trong các trường nhập liệu
+    public void removeAll() {
         til_namePartner.getEditText().setText("");
         til_addressPartner.getEditText().setText("");
         til_UserPartner.getEditText().setText("");
         til_PasswordPartner.getEditText().setText("");
-        til_PasswordPartner.getEditText().setText("");
         til_rePasswordPartner.getEditText().setText("");
         img_Partner.setImageResource(R.drawable.ic_menu_camera1);
     }
-    public List<Partner> getAllPartner(){
+
+    // Lấy danh sách tất cả đối tác
+    public List<Partner> getAllPartner() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Partner");
         List<Partner> list1 = new ArrayList<>();
@@ -220,7 +245,7 @@ public class PartnerFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list1.clear();
-                for (DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Partner partner = snap.getValue(Partner.class);
                     list1.add(partner);
                 }
@@ -234,7 +259,9 @@ public class PartnerFragment extends Fragment {
         });
         return list1;
     }
-    public List<User> getAllUser(){
+
+    // Lấy danh sách tất cả người dùng
+    public List<User> getAllUser() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("User");
         List<User> list1 = new ArrayList<>();
@@ -242,7 +269,7 @@ public class PartnerFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list1.clear();
-                for (DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     User user = snap.getValue(User.class);
                     list1.add(user);
                 }
@@ -256,30 +283,36 @@ public class PartnerFragment extends Fragment {
         });
         return list1;
     }
-    public void addPartner(Partner partner){
+
+    // Thêm đối tác vào cơ sở dữ liệu
+    public void addPartner(Partner partner) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Partner");
-        if (listPartner.size()==0){
+        if (listPartner.size() == 0) {
             partner.setIdPartner(1);
             reference.child("1").setValue(partner);
-        }else if (listPartner.size()!=0){
-            int i = listPartner.size()-1;
+        } else if (listPartner.size() != 0) {
+            int i = listPartner.size() - 1;
             int id = listPartner.get(i).getIdPartner() + 1;
             partner.setIdPartner(id);
-            reference.child(""+id).setValue(partner);
+            reference.child("" + id).setValue(partner);
         }
     }
 
+    // Mở camera để chụp ảnh
     private void captureImage() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         this.startActivityForResult(intent, REQUEST_ID_IMAGE_CAPTURE);
     }
+
+    // Mở thư viện ảnh để chọn ảnh
     private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
 
-    public void requestPermissionCamera(){
+    // Yêu cầu quyền truy cập camera
+    public void requestPermissionCamera() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -293,11 +326,13 @@ public class PartnerFragment extends Fragment {
         };
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn không cấp quyền,bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
+                .setDeniedMessage("Nếu bạn không cấp quyền, bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
                 .setPermissions(Manifest.permission.CAMERA)
                 .check();
     }
-    public void requestPermissionDevice(){
+
+    // Yêu cầu quyền truy cập thư viện ảnh
+    public void requestPermissionDevice() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -311,10 +346,11 @@ public class PartnerFragment extends Fragment {
         };
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn không cấp quyền,bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng" )
+                .setDeniedMessage("Nếu bạn không cấp quyền, bạn sẽ không thể tải ảnh lên\n\nVui lòng vào [Cài đặt] > [Quyền] và cấp quyền để sử dụng")
                 .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check();
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -327,17 +363,15 @@ public class PartnerFragment extends Fragment {
                 img_Partner.setImageURI(imageUri);
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(getContext(), "Bạn chưa thêm ảnh", Toast.LENGTH_LONG).show();
-            } else if (data!=null){
+            } else if (data != null) {
                 Toast.makeText(getContext(), "Lỗi", Toast.LENGTH_LONG).show();
-
             }
         }
         if (requestCode == PICK_IMAGE) {
-            if (resultCode == RESULT_OK ) {
+            if (resultCode == RESULT_OK) {
                 Uri imageUri = data.getData();
                 this.img_Partner.setImageURI(imageUri);
             }
         }
-
     }
 }

@@ -26,36 +26,33 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class PartnerFoodFragment extends Fragment implements Partner_FoodAdapter.ItemClickListener{
-    RecyclerView recyclerView_Partner_Food;
-    LinearLayoutManager linearLayoutManager;
-    List<Partner> list;
-    Partner_FoodAdapter partner_foodAdapter;
-
+// Lê Nguyễn Toàn Tâm - 21110797
+public class PartnerFoodFragment extends Fragment implements Partner_FoodAdapter.ItemClickListener {
+    private RecyclerView recyclerView_Partner_Food;
+    private LinearLayoutManager linearLayoutManager;
+    private List<Partner> list;
+    private Partner_FoodAdapter partner_foodAdapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_partner_food, container, false);
 
-        View view= inflater.inflate(R.layout.fragment_partner_food, container, false);
-
-
+        // Khởi tạo RecyclerView và thiết lập LayoutManager
         recyclerView_Partner_Food = view.findViewById(R.id.recyclerView_Partner_Food);
-
-        list = getAllPartner();
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView_Partner_Food.setLayoutManager(linearLayoutManager);
 
-        partner_foodAdapter = new Partner_FoodAdapter(list,this);
+        // Lấy danh sách đối tác và thiết lập Adapter
+        list = getAllPartner();
+        partner_foodAdapter = new Partner_FoodAdapter(list, this);
         recyclerView_Partner_Food.setAdapter(partner_foodAdapter);
-
-
 
         return view;
     }
 
-    public List<Partner> getAllPartner(){
+    // Hàm lấy danh sách đối tác từ Firebase
+    public List<Partner> getAllPartner() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Partner");
         List<Partner> list1 = new ArrayList<>();
@@ -63,7 +60,7 @@ public class PartnerFoodFragment extends Fragment implements Partner_FoodAdapter
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list1.clear();
-                for (DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Partner partner = snap.getValue(Partner.class);
                     list1.add(partner);
                 }
@@ -72,21 +69,21 @@ public class PartnerFoodFragment extends Fragment implements Partner_FoodAdapter
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Xử lý lỗi khi hủy lấy dữ liệu từ Firebase
             }
         });
         return list1;
     }
 
-
+    // Hàm xử lý sự kiện khi một đối tác được click
     @Override
     public void onItemClick(Partner partner) {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("Partner", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("partner",partner.getUserPartner());
+        editor.putString("partner", partner.getUserPartner());
         editor.apply();
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.frame_Home, new Food_Of_PartnerFragment(),null).addToBackStack(null).commit();
+        fragmentManager.beginTransaction().replace(R.id.frame_Home, new Food_Of_PartnerFragment(), null).addToBackStack(null).commit();
     }
 }

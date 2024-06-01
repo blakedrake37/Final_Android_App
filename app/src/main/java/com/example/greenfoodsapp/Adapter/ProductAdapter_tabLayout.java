@@ -8,7 +8,7 @@ import com.example.greenfoodsapp.Fragment.ProductFragments.FoodFragment;
 import com.example.greenfoodsapp.Fragment.ProductFragments.FruitFragment;
 import com.example.greenfoodsapp.Fragment.ProductFragments.MeatFragment;
 import com.example.greenfoodsapp.Fragment.ProductFragments.VegetableFragment;
-
+// Lê Nguyễn Toàn Tâm - 21110797
 public class ProductAdapter_tabLayout extends FragmentStateAdapter {
     public ProductAdapter_tabLayout(@NonNull Fragment fragment) {
         super(fragment);

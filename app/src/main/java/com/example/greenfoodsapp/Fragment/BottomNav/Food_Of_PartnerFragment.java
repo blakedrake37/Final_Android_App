@@ -28,59 +28,65 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
+// Lê Nguyễn Toàn Tâm - 21110797
 public class Food_Of_PartnerFragment extends Fragment {
-    RecyclerView food_of_partner_recyclerView;
-    LinearLayoutManager linearLayoutManager;
+    private RecyclerView food_of_partner_recyclerView;
+    private LinearLayoutManager linearLayoutManager;
     private List<Product> listProduct = new ArrayList<>();
     private ProductAdapter adapter;
-    private ProductFragment fragment= new ProductFragment();
+    private ProductFragment fragment = new ProductFragment();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_food__of__partner, container, false);
         food_of_partner_recyclerView = view.findViewById(R.id.food_of_partner_recyclerView);
 
+        // Load danh sách sản phẩm từ Firebase
         listProduct = loadListFood();
+
+        // Thiết lập LinearLayoutManager cho RecyclerView
         linearLayoutManager = new LinearLayoutManager(getContext());
         food_of_partner_recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new ProductAdapter(listProduct,fragment,getContext());
+
+        // Thiết lập Adapter cho RecyclerView
+        adapter = new ProductAdapter(listProduct, fragment, getContext());
         food_of_partner_recyclerView.setAdapter(adapter);
 
+        // Thiết lập GridLayoutManager cho RecyclerView
         food_of_partner_recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+
         return view;
     }
 
-    private List<Product> loadListFood(){
+    // Hàm load danh sách sản phẩm từ Firebase
+    private List<Product> loadListFood() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("Partner", Context.MODE_PRIVATE);
-        String partner = sharedPreferences.getString("partner","");
-        Log.d("aaaaaaaaaaa",partner);
+        String partner = sharedPreferences.getString("partner", "");
+        Log.d("Partner", partner);
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference1 = database.getReference("Product");
-//        DatabaseReference reference2 = database.getReference("Partner");
+        DatabaseReference reference = database.getReference("Product");
 
-
-        reference1.addValueEventListener(new ValueEventListener() {
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listProduct.clear();
-                for(DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Product product = snap.getValue(Product.class);
-                    if ( product.getCodeCategory()==4 && partner.equals(product.getUserPartner())){
+                    if (product != null && product.getCodeCategory() == 4 && partner.equals(product.getUserPartner())) {
                         listProduct.add(product);
                     }
-
                 }
                 adapter.notifyDataSetChanged();
-
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Xử lý lỗi khi hủy lấy dữ liệu từ Firebase
+                Log.e("Food_Of_PartnerFragment", "onCancelled", error.toException());
             }
         });
 

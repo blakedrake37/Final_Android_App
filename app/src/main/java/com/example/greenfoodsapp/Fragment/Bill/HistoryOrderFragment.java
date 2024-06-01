@@ -25,13 +25,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
+// Nguyễn Đức Huy - 20145449
 public class HistoryOrderFragment extends Fragment {
 
     private RecyclerView rvBill;
     private LinearLayoutManager linearLayoutManager;
     private AdapterBill adapterBill;
     private List<Bill> listBill = new ArrayList<>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,38 +41,41 @@ public class HistoryOrderFragment extends Fragment {
         initUi(view);
         return view;
     }
-    public void initUi(View view ){
+
+    // Hàm khởi tạo giao diện người dùng
+    public void initUi(View view) {
         getBill();
         rvBill = view.findViewById(R.id.rv_billHistory);
         linearLayoutManager = new LinearLayoutManager(getContext());
         rvBill.setLayoutManager(linearLayoutManager);
-        adapterBill = new AdapterBill(listBill,getContext());
+        adapterBill = new AdapterBill(listBill, getContext());
         rvBill.setAdapter(adapterBill);
     }
-    public void getBill(){
+
+    // Hàm lấy dữ liệu hóa đơn từ Firebase
+    public void getBill() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("Bill");
         SharedPreferences preferences = getContext().getSharedPreferences("My_User", Context.MODE_PRIVATE);
-        String user = preferences.getString("username","");
+        String user = preferences.getString("username", "");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listBill.clear();
-                for (DataSnapshot snap : snapshot.getChildren()){
+                for (DataSnapshot snap : snapshot.getChildren()) {
                     Bill bill = snap.getValue(Bill.class);
-                    if(user.equals(bill.getIdPartner()) && bill.getStatus().equals("Yes")){
+                    if (user.equals(bill.getIdPartner()) && bill.getStatus().equals("Yes")) {
                         listBill.add(bill);
-                    }else if (user.equals(bill.getIdClient()) && bill.getStatus().equals("Yes")){
+                    } else if (user.equals(bill.getIdClient()) && bill.getStatus().equals("Yes")) {
                         listBill.add(bill);
                     }
-
                 }
                 adapterBill.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Xử lý lỗi khi hủy lấy dữ liệu từ Firebase
             }
         });
     }

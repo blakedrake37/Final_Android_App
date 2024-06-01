@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.greenfoodsapp.R;
 
+
+// Ông Vũ Hữu Tài - 21110796
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     @Override
